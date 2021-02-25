@@ -1,8 +1,10 @@
-import { useState } from "react"
+import { useState, useContext } from "react"
 import { useRouter } from "next/router"
 import styled from "styled-components"
 import axios from "axios"
 import Input from "@/components/input/input"
+import UserContext from "@/context/context"
+import { io } from "socket.io-client"
 
 const StyledWrapper = styled.section`
   align-items: center;
@@ -40,16 +42,17 @@ const StyledSubmitButton = styled.button`
 // const socket = io("http://localhost:3001")
 
 const Chat = () => {
-  const [user, setUser] = useState("")
+  const [nick, setNick] = useState("")
   const [password, setPassword] = useState("")
+  const { handleUser, toggleAuth } = useContext(UserContext)
+  const [socketId, setID] = useState("")
 
   const router = useRouter()
-  console.log(router)
 
   const handleInput = (e: any): any => {
     switch (e.target.name) {
       case "username": {
-        setUser(e.target.value)
+        setNick(e.target.value)
         return
       }
       case "password": {
@@ -61,17 +64,26 @@ const Chat = () => {
 
   const handleLogin = async (e: any) => {
     e.preventDefault()
-    await axios
-      .post("http://localhost:3001/auth", {
-        username: user,
-        password,
-      })
-      .then(res => {
-        if (res.status === 200) router.push("/dashboard")
-      })
-      .catch(err => {
-        throw err
-      })
+    const socket = io("http://localhost:3001")
+    socket.on("connect", async () => {
+      await axios
+        .post("http://localhost:3001/auth", {
+          username: nick,
+          password,
+          socketId: socket.id,
+        })
+        .then(res => {
+          if (res.status === 200) {
+            handleUser(res.data.username)
+            toggleAuth()
+            console.log(res)
+            router.push("/dashboard")
+          }
+        })
+        .catch(err => {
+          console.log(err)
+        })
+    })
   }
 
   return (
@@ -80,7 +92,7 @@ const Chat = () => {
         <Input
           onChange={handleInput}
           label="Username"
-          value={user}
+          value={nick}
           type="text"
           name="username"
         />
