@@ -5,6 +5,7 @@ import axios from "axios"
 import Input from "@/components/input/input"
 import UserContext from "@/context/context"
 import { io } from "socket.io-client"
+import { SERVER_DOMAIN } from "@/constants/index"
 
 const StyledWrapper = styled.section`
   align-items: center;
@@ -20,8 +21,9 @@ const LoginForm = styled.form`
   grid-template-rows: repeat(3, 1fr);
   height: auto;
   min-height: 40px;
-  padding: 5vw;
-  width: 40%;
+  padding: 50px;
+  min-width: 20%;
+  width: auto;
 `
 const StyledSubmitButton = styled.button`
   background-color: #3b52ff;
@@ -49,7 +51,7 @@ const Chat = () => {
 
   const router = useRouter()
 
-  const handleInput = (e: any): any => {
+  const handleInput = (e: never): any => {
     switch (e.target.name) {
       case "username": {
         setNick(e.target.value)
@@ -64,10 +66,10 @@ const Chat = () => {
 
   const handleLogin = async (e: any) => {
     e.preventDefault()
-    const socket = io("http://localhost:3001")
+    const socket = io(SERVER_DOMAIN)
     socket.on("connect", async () => {
       await axios
-        .post("http://localhost:3001/auth", {
+        .post(`${SERVER_DOMAIN}/auth`, {
           username: nick,
           password,
           socketId: socket.id,
