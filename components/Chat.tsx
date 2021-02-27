@@ -26,7 +26,7 @@ const LoginForm = styled.form`
   width: auto;
 `
 const StyledSubmitButton = styled.button`
-  background-color: #3b52ff;
+  background-color: ${({ theme }) => theme.light.cta};
   border: none;
   border-radius: 8px;
   color: #fff;
@@ -34,7 +34,7 @@ const StyledSubmitButton = styled.button`
   font-size: 1em;
   height: max-content;
   padding: 15px 20px;
-  width: 40%;
+  width: 100%;
 
   &:focus {
     outline: none;

@@ -1,18 +1,26 @@
 import React, { useContext, useEffect, useState } from "react"
 import styled from "styled-components"
 import UserContext from "@/context/context"
-import { io } from "socket.io-client"
 import { useRouter } from "next/router"
 import CreateRoom from "@/components/createRoom/createRoom"
-import { Room } from "@/constants/index"
+import Modal from "@/components/hoc/withModal"
+import withThemeContext from "@/context/themeContext"
 
-const StyledWrapper = styled.main`
+interface ThemeProps {
+  themeState: string
+}
+
+const StyledWrapper = styled.main<ThemeProps>`
+  background-color: ${({ theme, themeState }) =>
+    themeState === "light" ? theme.light.background : theme.dark.background};
   height: 100vh;
   padding: 2vw 5vw;
   position: relative;
   width: 100%;
 `
-const StyledWelcome = styled.h2`
+const StyledWelcome = styled.h2<ThemeProps>`
+  color: ${({ theme, themeState }) =>
+    themeState === "light" ? theme.light.text : theme.dark.text};
   font-size: 2.5em;
   font-weight: 400;
 `
@@ -50,7 +58,7 @@ const rooms = [
   { name: "Blinders", slug: "blinders" },
 ]
 
-const Dashboard: React.FC = () => {
+const Dashboard = ({ handleTheme, state: { theme } }) => {
   const router = useRouter()
   const ctx = useContext(UserContext)
   const [toggleModal, setModal] = useState(false)
@@ -59,16 +67,15 @@ const Dashboard: React.FC = () => {
     if (ctx.user === "") router.push("/")
   }, [ctx.user])
 
-  Room()
-
   const handleRoom = slug => {
     router.push(`/rooms/${slug}`)
   }
   const handleModal = () => setModal(!toggleModal)
 
   return (
-    <StyledWrapper>
-      <StyledWelcome>Hello, {ctx.user}</StyledWelcome>
+    <StyledWrapper themeState={theme}>
+      <StyledWelcome themeState={theme}>Hello, {ctx.user}</StyledWelcome>
+      <button onClick={handleTheme}>Toggle theme</button>
       <StyledRoomsGrid>
         <StyledRoom onClick={handleModal}>
           <StyledRoomImage />
@@ -77,15 +84,19 @@ const Dashboard: React.FC = () => {
         {rooms.map(({ name, slug }) => {
           return (
             <StyledRoom onClick={() => handleRoom(slug)}>
-              <StyledRoomImage></StyledRoomImage>
+              <StyledRoomImage />
               <RoomName>{name}</RoomName>
             </StyledRoom>
           )
         })}
       </StyledRoomsGrid>
-      <CreateRoom toggleModal={toggleModal} closeModal={handleModal} />
+      {toggleModal && (
+        <Modal>
+          <CreateRoom toggleModal={toggleModal} closeModal={handleModal} />
+        </Modal>
+      )}
     </StyledWrapper>
   )
 }
 
-export default Dashboard
+export default withThemeContext(Dashboard)

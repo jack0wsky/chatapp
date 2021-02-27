@@ -1,6 +1,8 @@
 import { useState } from "react"
-import { createGlobalStyle } from "styled-components"
+import { createGlobalStyle, ThemeProvider } from "styled-components"
 import UserContext from "@/context/context"
+import { ContextThemeProvider } from "@/context/themeContext"
+import { theme } from "@/theme/theme"
 
 const GlobalStyle = createGlobalStyle`
   *, *::before, *::after {
@@ -17,10 +19,14 @@ const MyApp = ({ Component, pageProps }) => {
   const toggleAuth = () => setAuth(!auth)
   return (
     <>
-      <UserContext.Provider value={{ user, auth, handleUser, toggleAuth }}>
-        <GlobalStyle />
-        <Component {...pageProps} />
-      </UserContext.Provider>
+      <ThemeProvider theme={theme}>
+        <ContextThemeProvider>
+          <UserContext.Provider value={{ user, auth, handleUser, toggleAuth }}>
+            <GlobalStyle />
+            <Component {...pageProps} />
+          </UserContext.Provider>
+        </ContextThemeProvider>
+      </ThemeProvider>
     </>
   )
 }

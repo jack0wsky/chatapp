@@ -13,7 +13,7 @@ const StyledLabel = styled.label`
 `
 
 const StyledInput = styled.input`
-  border: none;
+  border: 1px solid #ddd;
   border-radius: 8px;
   font-size: 1em;
   padding: 10px;
@@ -28,7 +28,7 @@ interface Props {
   value: string
   type: string
   name: string
-  onChange: () => any
+  onChange: (object) => any
 }
 
 const Input: React.FC<Props> = ({ label, value, type, name, onChange }) => {

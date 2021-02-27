@@ -3,6 +3,7 @@ import styled from "styled-components"
 import { io } from "socket.io-client"
 import { useRouter } from "next/router"
 import UserContext from "@/context/context"
+import Message from "@/components/message/Message"
 
 const StyledChatContainer = styled.section`
   height: 100vh;
@@ -12,7 +13,7 @@ const ChatWrapper = styled.div`
   display: flex;
   flex-flow: column;
   height: 90%;
-  width: 60vw;
+  width: 100%;
 `
 const Messages = styled.div`
   display: flex;
@@ -20,23 +21,6 @@ const Messages = styled.div`
   height: auto;
   min-height: 60vh;
   width: 100%;
-`
-const Message = styled.div`
-  display: flex;
-  flex-flow: column;
-  color: #000;
-  background-color: #ddd;
-  height: auto;
-  min-height: 50px;
-  width: max-content;
-  padding: 10px;
-  min-width: 50px;
-  max-width: 30vw;
-`
-const MyMessage = styled(Message)`
-  align-self: flex-end;
-  color: #fff;
-  background-color: #3b52ff;
 `
 const Text = styled.p`
   width: max-content;
@@ -47,6 +31,32 @@ const WriteBox = styled.div`
   height: auto;
   min-height: 60px;
   width: 100%;
+`
+const StyledInput = styled.input`
+  border: 1px solid #dedede;
+  border-radius: 50px;
+  font-size: 1em;
+  height: 44px;
+  margin: 0 20px;
+  padding: 20px;
+
+  &:focus {
+    outline: none;
+  }
+`
+const StyledSendButton = styled.button`
+  color: ${({ theme }) => theme.light.white};
+  background-color: ${({ theme }) => theme.light.cta};
+  border: none;
+  border-radius: 50px;
+  cursor: pointer;
+  height: 44px;
+  padding: 0 20px;
+  width: max-content;
+
+  &:focus {
+    outline: none;
+  }
 `
 
 const RoomTemplate = () => {
@@ -70,6 +80,7 @@ const RoomTemplate = () => {
     })
   }, [])
 
+  // TODO add timestamp
   const sendMessage = e => {
     e.preventDefault()
     socket.emit("sendMessage", { name: ctx.user, room: query.slug, message })
@@ -84,26 +95,22 @@ const RoomTemplate = () => {
       <ChatWrapper>
         <Messages>
           {messages.map(({ message, name }) => {
-            if (name === ctx.user) {
-              return (
-                <MyMessage>
-                  <Text>{message}</Text>
-                  <Text>{name}</Text>
-                </MyMessage>
-              )
-            } else {
-              return (
-                <Message>
-                  <Text>{message}</Text>
-                  <Text>{name}</Text>
-                </Message>
-              )
-            }
+            return (
+              <Message
+                message={message}
+                user={name}
+                isUser={ctx.user === "Jacek"}
+              />
+            )
           })}
         </Messages>
         <WriteBox>
-          <input value={message} onChange={e => handleMessage(e)} type="text" />
-          <button onClick={sendMessage}>Send</button>
+          <StyledInput
+            value={message}
+            onChange={e => handleMessage(e)}
+            type="text"
+          />
+          <StyledSendButton onClick={sendMessage}>Send</StyledSendButton>
         </WriteBox>
       </ChatWrapper>
     </StyledChatContainer>
