@@ -10,6 +10,17 @@ const GlobalStyle = createGlobalStyle`
     margin: 0;
     padding: 0;
   }
+  
+  button {
+    background-color: #fff;
+    border: none;
+    cursor: pointer;
+    font-size: 1em;
+    
+    &:focus {
+      outline: none;
+    }
+  }
 `
 
 const MyApp = ({ Component, pageProps }) => {

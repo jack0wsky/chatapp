@@ -46,6 +46,9 @@ const CTAButton = styled.button`
   &:hover {
     background-color: #f6f6f6;
   }
+  &:focus {
+    outline: none;
+  }
 `
 const CancelButton = styled(CTAButton)`
   color: ${({ theme }) => theme.light.warning};

@@ -1,15 +1,14 @@
 import styled from "styled-components"
-import { is } from "@babel/types"
 
 interface iProps {
-  isUser: string
+  isUser: () => boolean
 }
 
 const StyledContainer = styled.div<iProps>`
   align-items: flex-end;
   background-color: transparent;
   display: flex;
-  flex-flow: ${({ isUser }) => !isUser && "row-reverse"};
+  flex-flow: ${({ isUser }) => (isUser ? "row" : "row-reverse")};
   align-self: ${({ isUser }) => (isUser ? "flex-end" : "flex-start")};
   height: max-content;
   padding: 10px;
@@ -24,10 +23,11 @@ const StyledMessageContainer = styled.div`
   width: auto;
 `
 
-const StyledMessage = styled.p`
-  background-color: blue;
+const StyledMessage = styled.p<iProps>`
+  background-color: ${({ isUser }) => (isUser ? "blue" : "#fff")};
+  border: ${({ isUser }) => (isUser ? "none" : "1px solid #ddd")};
   border-radius: 50px;
-  color: #fff;
+  color: ${({ isUser }) => (isUser ? "#fff" : "#000")};
   height: max-content;
   padding: 10px 20px;
   min-width: 20px;
@@ -55,7 +55,7 @@ const Message = ({ message, user, isUser }) => {
     <StyledContainer isUser={isUser}>
       <StyledMessageContainer>
         <StyledUser isUser={isUser}>{user}</StyledUser>
-        <StyledMessage>{message}</StyledMessage>
+        <StyledMessage isUser={isUser}>{message}</StyledMessage>
       </StyledMessageContainer>
       <StyledUserImg isUser={isUser} />
     </StyledContainer>

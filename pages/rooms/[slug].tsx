@@ -22,9 +22,6 @@ const Messages = styled.div`
   min-height: 60vh;
   width: 100%;
 `
-const Text = styled.p`
-  width: max-content;
-`
 const WriteBox = styled.div`
   justify-self: flex-end;
   display: flex;
@@ -58,40 +55,68 @@ const StyledSendButton = styled.button`
     outline: none;
   }
 `
+const StyledWelcome = styled.div`
+  align-items: center;
+  display: flex;
+  height: 70px;
+  padding: 0 5vw;
+  width: 100%;
+`
+const StyledReturnLink = styled.button`
+  font-size: 1em;
+  margin: 0 20px 0 0;
+`
+
+export const StyledTitle = styled.h3``
 
 const RoomTemplate = () => {
   const socket = io("http://localhost:3001")
-  const { query } = useRouter()
+  const router = useRouter()
   const [welcome, setWelcome] = useState("")
   const [message, setMessage] = useState("")
   const [messages, setMessages] = useState([])
   const ctx = useContext(UserContext)
 
   useEffect(() => {
-    socket.emit("join", { name: ctx.user, slug: query.slug })
+    socket.emit("join", { name: ctx.user, slug: router.query.slug })
     socket.on("helloMessage", ({ text }) => {
       setWelcome(text)
+    })
+    socket.on("globalMessage", msg => {
+      console.log(msg)
     })
   }, [])
 
   useEffect(() => {
     socket.on("message", msg => {
-      setMessages([...messages, msg])
+      setMessages(prevState => [...prevState, msg])
     })
-  }, [])
+    console.log(messages)
+  }, [messages])
 
   // TODO add timestamp
   const sendMessage = e => {
     e.preventDefault()
-    socket.emit("sendMessage", { name: ctx.user, room: query.slug, message })
+    socket.emit("sendMessage", {
+      name: ctx.user,
+      room: router.query.slug,
+      message,
+    })
     setMessage("")
   }
   const handleMessage = e => {
     setMessage(e.target.value)
   }
+  const handleReturn = () => {
+    router.push("/dashboard")
+  }
+
   return (
     <StyledChatContainer>
-      {welcome}
+      <StyledWelcome>
+        <StyledReturnLink onClick={handleReturn}>Return</StyledReturnLink>
+        <StyledTitle>{welcome}</StyledTitle>
+      </StyledWelcome>
       <ChatWrapper>
         <Messages>
           {messages.map(({ message, name }) => {
@@ -99,7 +124,7 @@ const RoomTemplate = () => {
               <Message
                 message={message}
                 user={name}
-                isUser={ctx.user === "Jacek"}
+                isUser={name === ctx.user}
               />
             )
           })}

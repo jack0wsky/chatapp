@@ -4,7 +4,10 @@ import UserContext from "@/context/context"
 import { useRouter } from "next/router"
 import CreateRoom from "@/components/createRoom/createRoom"
 import Modal from "@/components/hoc/withModal"
+import Friends from "@/components/friends/friends"
 import withThemeContext from "@/context/themeContext"
+import axios from "axios"
+import { SERVER_DOMAIN } from "@/constants/index"
 
 interface ThemeProps {
   themeState: string
@@ -33,7 +36,7 @@ const StyledRoomsGrid = styled.div`
   min-height: 100px;
   width: max-content;
 `
-const StyledRoom = styled.button`
+export const StyledRoom = styled.button`
   background-color: transparent;
   border: none;
   cursor: pointer;
@@ -44,13 +47,16 @@ const StyledRoom = styled.button`
     outline: none;
   }
 `
-const StyledRoomImage = styled.div`
+export const StyledRoomImage = styled.div`
+  align-items: center;
   background-color: #ddd;
   border-radius: 50%;
+  display: flex;
   height: 70px;
+  justify-content: center;
   width: 70px;
 `
-const RoomName = styled.p`
+export const RoomName = styled.p`
   margin: 10px 0 0;
 `
 const rooms = [
@@ -62,10 +68,24 @@ const Dashboard = ({ handleTheme, state: { theme } }) => {
   const router = useRouter()
   const ctx = useContext(UserContext)
   const [toggleModal, setModal] = useState(false)
+  const [user, setUser] = useState({})
 
   useEffect(() => {
     if (ctx.user === "") router.push("/")
   }, [ctx.user])
+
+  const getCurrentUserData = async nick => {
+    await axios
+      .get(`${SERVER_DOMAIN}/users`, {
+        params: {
+          nick,
+        },
+      })
+      .then(res => setUser(res.data.user))
+      .catch(err => console.log(err))
+  }
+
+  useEffect(async () => await getCurrentUserData(ctx.user), [])
 
   const handleRoom = slug => {
     router.push(`/rooms/${slug}`)
@@ -76,14 +96,15 @@ const Dashboard = ({ handleTheme, state: { theme } }) => {
     <StyledWrapper themeState={theme}>
       <StyledWelcome themeState={theme}>Hello, {ctx.user}</StyledWelcome>
       <button onClick={handleTheme}>Toggle theme</button>
+      <Friends friends={user.friends} />
       <StyledRoomsGrid>
         <StyledRoom onClick={handleModal}>
-          <StyledRoomImage />
+          <StyledRoomImage>+</StyledRoomImage>
           <RoomName>Add new</RoomName>
         </StyledRoom>
         {rooms.map(({ name, slug }) => {
           return (
-            <StyledRoom onClick={() => handleRoom(slug)}>
+            <StyledRoom key={name} onClick={() => handleRoom(slug)}>
               <StyledRoomImage />
               <RoomName>{name}</RoomName>
             </StyledRoom>
