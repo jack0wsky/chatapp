@@ -5,25 +5,26 @@ import { useRouter } from "next/router"
 import CreateRoom from "@/components/createRoom/createRoom"
 import Modal from "@/components/hoc/withModal"
 import Friends from "@/components/friends/friends"
+import Header from "@/components/header/header"
 import withThemeContext from "@/context/themeContext"
 import axios from "axios"
 import { SERVER_DOMAIN } from "@/constants/index"
+import app from "@/constants/firebase"
 
 interface ThemeProps {
-  themeState: string
+  themeState: boolean
 }
 
 const StyledWrapper = styled.main<ThemeProps>`
   background-color: ${({ theme, themeState }) =>
-    themeState === "light" ? theme.light.background : theme.dark.background};
+    themeState ? theme.dark.background : theme.light.background};
   height: 100vh;
-  padding: 2vw 5vw;
   position: relative;
   width: 100%;
 `
 const StyledWelcome = styled.h2<ThemeProps>`
   color: ${({ theme, themeState }) =>
-    themeState === "light" ? theme.light.text : theme.dark.text};
+    themeState ? theme.dark.text : theme.light.text};
   font-size: 2.5em;
   font-weight: 400;
 `
@@ -56,23 +57,27 @@ export const StyledRoomImage = styled.div`
   justify-content: center;
   width: 70px;
 `
-export const RoomName = styled.p`
+export const RoomName = styled.p<ThemeProps>`
+  color: ${({ theme, themeState }) =>
+    themeState ? theme.dark.text : theme.light.text};
   margin: 10px 0 0;
+`
+export const StyledContentWrapper = styled.section`
+  height: auto;
+  min-height: 60vh;
+  padding: 0 5vw;
+  width: 100%;
 `
 const rooms = [
   { name: "Culture Talk", slug: "culture-talk" },
   { name: "Blinders", slug: "blinders" },
 ]
 
-const Dashboard = ({ handleTheme, state: { theme } }) => {
+const Dashboard = ({ state: { light } }) => {
   const router = useRouter()
   const ctx = useContext(UserContext)
   const [toggleModal, setModal] = useState(false)
-  const [user, setUser] = useState({})
-
-  useEffect(() => {
-    if (ctx.user === "") router.push("/")
-  }, [ctx.user])
+  const [user, setUser] = useState(null)
 
   const getCurrentUserData = async nick => {
     await axios
@@ -85,37 +90,40 @@ const Dashboard = ({ handleTheme, state: { theme } }) => {
       .catch(err => console.log(err))
   }
 
-  useEffect(async () => await getCurrentUserData(ctx.user), [])
+  useEffect(() => {
+    setUser(app.auth().currentUser.displayName)
+  }, [])
 
   const handleRoom = slug => {
-    router.push(`/rooms/${slug}`)
+    router.push(`/chat/${slug}`)
   }
   const handleModal = () => setModal(!toggleModal)
 
   return (
-    <StyledWrapper themeState={theme}>
-      <StyledWelcome themeState={theme}>Hello, {ctx.user}</StyledWelcome>
-      <button onClick={handleTheme}>Toggle theme</button>
-      <Friends friends={user.friends} />
-      <StyledRoomsGrid>
-        <StyledRoom onClick={handleModal}>
-          <StyledRoomImage>+</StyledRoomImage>
-          <RoomName>Add new</RoomName>
-        </StyledRoom>
-        {rooms.map(({ name, slug }) => {
-          return (
-            <StyledRoom key={name} onClick={() => handleRoom(slug)}>
-              <StyledRoomImage />
-              <RoomName>{name}</RoomName>
-            </StyledRoom>
-          )
-        })}
-      </StyledRoomsGrid>
-      {toggleModal && (
-        <Modal>
-          <CreateRoom toggleModal={toggleModal} closeModal={handleModal} />
-        </Modal>
-      )}
+    <StyledWrapper themeState={light}>
+      <Header />
+      <StyledContentWrapper>
+        <StyledWelcome themeState={light}>Hello, {user}</StyledWelcome>
+        <StyledRoomsGrid>
+          <StyledRoom onClick={handleModal}>
+            <StyledRoomImage>+</StyledRoomImage>
+            <RoomName themeState={light}>Add new</RoomName>
+          </StyledRoom>
+          {rooms.map(({ name, slug }) => {
+            return (
+              <StyledRoom key={name} onClick={() => handleRoom(slug)}>
+                <StyledRoomImage />
+                <RoomName themeState={light}>{name}</RoomName>
+              </StyledRoom>
+            )
+          })}
+        </StyledRoomsGrid>
+        {toggleModal && (
+          <Modal>
+            <CreateRoom toggleModal={toggleModal} closeModal={handleModal} />
+          </Modal>
+        )}
+      </StyledContentWrapper>
     </StyledWrapper>
   )
 }

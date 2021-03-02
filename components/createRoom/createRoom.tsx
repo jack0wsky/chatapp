@@ -79,10 +79,10 @@ const CreateRoom: ({ toggleModal, closeModal }: Props) => JSX.Element = ({
       transition={{ from: 30 }}
       variants={variants}
     >
-      <StyledName>Create Chat</StyledName>
+      <StyledName>Create Hello</StyledName>
       <InputsContainer>
         <Input
-          label="Chat name"
+          label="Hello name"
           value={chatName}
           type="text"
           name="chat"

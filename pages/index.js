@@ -1,13 +1,15 @@
 import Head from "next/head"
-import Chat from "components/Chat"
+import Hello from "@/components/Hello"
 
-export default function Home() {
+const Home = () => {
   return (
     <div>
       <Head>
         <title>Chat app</title>
       </Head>
-      <Chat />
+      <Hello />
     </div>
   )
 }
+
+export default Home

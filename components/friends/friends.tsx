@@ -1,7 +1,7 @@
 import styled from "styled-components"
 import React from "react"
 import { RoomName, StyledRoom, StyledRoomImage } from "@/pages/dashboard"
-import { StyledTitle } from "@/pages/rooms/[slug]"
+import { StyledTitle } from "@/pages/chat/[slug]"
 
 const StyledContainer = styled.section<StyledProps>`
   align-items: center;
@@ -15,19 +15,20 @@ const StyledContainer = styled.section<StyledProps>`
 
 type Props = {
   friends: any
+  themeState: boolean
 }
 type StyledProps = {
   arrayLength: number
 }
 
-const Friends = ({ friends }: Props) => {
+const Friends = ({ friends, themeState }: Props) => {
   return (
     <StyledContainer arrayLength={friends.length}>
       {friends.map(({ name }) => {
         return (
           <StyledRoom key={name}>
             <StyledRoomImage />
-            <RoomName>{name}</RoomName>
+            <RoomName themeState={themeState}>{name}</RoomName>
           </StyledRoom>
         )
       })}

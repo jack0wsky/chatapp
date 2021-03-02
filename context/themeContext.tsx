@@ -1,25 +1,18 @@
 import React, { Component, createContext } from "react"
 
-enum Theme {
-  light = "light",
-  dark = "dark",
-}
+const darkMode = "(prefers-color-scheme: dark)"
+// TODO set prefered mode
 
-type ThemeProps = {
-  state: string
-  handleTheme: any
-}
-
-const ThemeContext = createContext(Theme.light)
+export const ThemeContext = createContext(true)
 
 export class ContextThemeProvider extends Component<any, any> {
   state = {
-    theme: Theme.light,
+    light: true,
   }
   handleToggleTheme = () => {
-    this.state.theme === Theme.light
-      ? this.setState({ theme: Theme.dark })
-      : this.setState({ theme: Theme.light })
+    this.state.light
+      ? this.setState({ light: false })
+      : this.setState({ light: true })
   }
 
   render() {

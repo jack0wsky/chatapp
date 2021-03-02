@@ -1,13 +1,18 @@
 import { useState, useContext } from "react"
 import { useRouter } from "next/router"
+import { ThemeContext } from "@/context/themeContext"
 import styled from "styled-components"
-import axios from "axios"
 import Input from "@/components/input/input"
 import UserContext from "@/context/context"
-import { io } from "socket.io-client"
-import { SERVER_DOMAIN } from "@/constants/index"
+import Firebase from "@/constants/firebase"
 
-const StyledWrapper = styled.section`
+interface StyledProps {
+  themeState: boolean
+}
+
+const StyledWrapper = styled.section<StyledProps>`
+  background-color: ${({ theme, themeState }) =>
+    themeState ? theme.dark.background : theme.light.background};
   align-items: center;
   display: flex;
   height: 100vh;
@@ -41,20 +46,19 @@ const StyledSubmitButton = styled.button`
   }
 `
 
-// const socket = io("http://localhost:3001")
-
-const Chat = () => {
-  const [nick, setNick] = useState("")
+const Hello = () => {
+  const [email, setEmail] = useState("")
   const [password, setPassword] = useState("")
-  const { handleUser, toggleAuth } = useContext(UserContext)
+  const userContext = useContext(UserContext)
+  const themeContext = useContext(ThemeContext)
   const [socketId, setID] = useState("")
 
   const router = useRouter()
 
   const handleInput = (e: never): any => {
     switch (e.target.name) {
-      case "username": {
-        setNick(e.target.value)
+      case "email": {
+        setEmail(e.target.value)
         return
       }
       case "password": {
@@ -64,39 +68,38 @@ const Chat = () => {
     }
   }
 
-  const handleLogin = async (e: any) => {
-    e.preventDefault()
-    const socket = io(SERVER_DOMAIN)
-    socket.on("connect", async () => {
-      await axios
-        .post(`${SERVER_DOMAIN}/auth`, {
-          username: nick,
-          password,
-          socketId: socket.id,
-        })
-        .then(res => {
-          if (res.status === 200) {
-            handleUser(res.data.username)
-            toggleAuth()
+  const firebaseInit = () => {
+    Firebase.auth()
+      .signInWithEmailAndPassword(email, password)
+      .then(() => {
+        const user = Firebase.auth().currentUser
+        user
+          .updateProfile({
+            displayName: "Jacek",
+          })
+          .then(res => {
             console.log(res)
             router.push("/dashboard")
-          }
-        })
-        .catch(err => {
-          console.log(err)
-        })
-    })
+          })
+          .catch(err => console.log(err))
+      })
+      .catch(err => console.log(err))
+  }
+
+  const handleLogin = (e: any) => {
+    e.preventDefault()
+    firebaseInit()
   }
 
   return (
-    <StyledWrapper>
+    <StyledWrapper themeState={themeContext.state.light}>
       <LoginForm>
         <Input
           onChange={handleInput}
-          label="Username"
-          value={nick}
+          label="E-mail"
+          value={email}
           type="text"
-          name="username"
+          name="email"
         />
         <Input
           label="Password"
@@ -113,4 +116,4 @@ const Chat = () => {
   )
 }
 
-export default Chat
+export default Hello

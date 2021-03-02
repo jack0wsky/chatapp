@@ -6,6 +6,7 @@ import UserContext from "@/context/context"
 import Message from "@/components/message/Message"
 
 const StyledChatContainer = styled.section`
+  background-color: ${({ theme }) => theme.light.background};
   height: 100vh;
   width: 100%;
 `
