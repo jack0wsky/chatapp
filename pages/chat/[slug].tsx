@@ -3,10 +3,17 @@ import styled from "styled-components"
 import { io } from "socket.io-client"
 import { useRouter } from "next/router"
 import UserContext from "@/context/context"
+import { ThemeContext } from "@/context/themeContext"
 import Message from "@/components/message/Message"
+import ChatHeader from "@/components/chatHeader/chatHeader"
 
-const StyledChatContainer = styled.section`
-  background-color: ${({ theme }) => theme.light.background};
+type StyledProps = {
+  themeState: boolean
+}
+
+const StyledChatContainer = styled.section<StyledProps>`
+  background-color: ${({ theme, themeState }) =>
+    themeState ? theme.dark.background : theme.light.background};
   height: 100vh;
   width: 100%;
 `
@@ -19,24 +26,29 @@ const ChatWrapper = styled.div`
 const Messages = styled.div`
   display: flex;
   flex-flow: column;
-  height: auto;
+  height: 95vh;
   min-height: 60vh;
+  overflow-y: auto;
   width: 100%;
 `
 const WriteBox = styled.div`
   justify-self: flex-end;
   display: flex;
-  height: auto;
+  height: 5vh;
   min-height: 60px;
   width: 100%;
 `
-const StyledInput = styled.input`
-  border: 1px solid #dedede;
+const StyledInput = styled.input<StyledProps>`
+  background-color: ${({ theme, themeState }) =>
+    themeState ? theme.dark.lightBg : theme.light.lightBg};
+  border: ${({ theme, themeState }) =>
+    themeState ? theme.dark.lightBg : theme.light.lightBg};
   border-radius: 50px;
   font-size: 1em;
   height: 44px;
   margin: 0 20px;
   padding: 20px;
+  width: 60%;
 
   &:focus {
     outline: none;
@@ -56,13 +68,6 @@ const StyledSendButton = styled.button`
     outline: none;
   }
 `
-const StyledWelcome = styled.div`
-  align-items: center;
-  display: flex;
-  height: 70px;
-  padding: 0 5vw;
-  width: 100%;
-`
 const StyledReturnLink = styled.button`
   font-size: 1em;
   margin: 0 20px 0 0;
@@ -76,15 +81,18 @@ const RoomTemplate = () => {
   const [welcome, setWelcome] = useState("")
   const [message, setMessage] = useState("")
   const [messages, setMessages] = useState([])
+  const [adminMessage, setAdminMessage] = useState("")
   const ctx = useContext(UserContext)
+  const themeCtx = useContext(ThemeContext)
 
   useEffect(() => {
     socket.emit("join", { name: ctx.user, slug: router.query.slug })
     socket.on("helloMessage", ({ text }) => {
       setWelcome(text)
     })
-    socket.on("globalMessage", msg => {
-      console.log(msg)
+    socket.on("globalMessage", ({ text }) => {
+      console.log(text)
+      setAdminMessage(text)
     })
   }, [])
 
@@ -93,15 +101,17 @@ const RoomTemplate = () => {
       setMessages(prevState => [...prevState, msg])
     })
     console.log(messages)
-  }, [messages])
+  }, [])
 
   // TODO add timestamp
   const sendMessage = e => {
     e.preventDefault()
+    const timestamp = new Date()
     socket.emit("sendMessage", {
       name: ctx.user,
       room: router.query.slug,
       message,
+      timestamp,
     })
     setMessage("")
   }
@@ -113,16 +123,18 @@ const RoomTemplate = () => {
   }
 
   return (
-    <StyledChatContainer>
-      <StyledWelcome>
-        <StyledReturnLink onClick={handleReturn}>Return</StyledReturnLink>
-        <StyledTitle>{welcome}</StyledTitle>
-      </StyledWelcome>
+    <StyledChatContainer themeState={themeCtx.state}>
+      <ChatHeader
+        theme={themeCtx.state}
+        welcome={welcome}
+        chatStatus={adminMessage}
+      />
       <ChatWrapper>
         <Messages>
-          {messages.map(({ message, name }) => {
+          {messages.map(({ message, name, timestamp }) => {
             return (
               <Message
+                key={timestamp}
                 message={message}
                 user={name}
                 isUser={name === ctx.user}
@@ -132,8 +144,10 @@ const RoomTemplate = () => {
         </Messages>
         <WriteBox>
           <StyledInput
+            themeState={themeCtx.state}
             value={message}
             onChange={e => handleMessage(e)}
+            placeholder="Write..."
             type="text"
           />
           <StyledSendButton onClick={sendMessage}>Send</StyledSendButton>

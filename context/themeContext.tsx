@@ -18,7 +18,7 @@ export class ContextThemeProvider extends Component<any, any> {
   render() {
     return (
       <ThemeContext.Provider
-        value={{ state: this.state, handleTheme: this.handleToggleTheme }}
+        value={{ state: this.state.light, handleTheme: this.handleToggleTheme }}
       >
         {this.props.children}
       </ThemeContext.Provider>

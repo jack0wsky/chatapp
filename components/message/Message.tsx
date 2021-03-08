@@ -1,7 +1,10 @@
+import { useContext } from "react"
+import { ThemeContext } from "@/context/themeContext"
 import styled from "styled-components"
 
 interface iProps {
   isUser: () => boolean
+  themeState?: boolean
 }
 
 const StyledContainer = styled.div<iProps>`
@@ -24,7 +27,8 @@ const StyledMessageContainer = styled.div`
 `
 
 const StyledMessage = styled.p<iProps>`
-  background-color: ${({ isUser }) => (isUser ? "blue" : "#fff")};
+  background-color: ${({ isUser, theme }) =>
+    isUser ? theme.light.userMessage : "#fff"};
   border: ${({ isUser }) => (isUser ? "none" : "1px solid #ddd")};
   border-radius: 50px;
   color: ${({ isUser }) => (isUser ? "#fff" : "#000")};
@@ -51,8 +55,9 @@ const StyledUserImg = styled.div<iProps>`
 `
 
 const Message = ({ message, user, isUser }) => {
+  const ctx = useContext(ThemeContext)
   return (
-    <StyledContainer isUser={isUser}>
+    <StyledContainer isUser={isUser} themeState={ctx.state}>
       <StyledMessageContainer>
         <StyledUser isUser={isUser}>{user}</StyledUser>
         <StyledMessage isUser={isUser}>{message}</StyledMessage>

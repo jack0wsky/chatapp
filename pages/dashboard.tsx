@@ -38,8 +38,12 @@ const StyledRoomsGrid = styled.div`
   width: max-content;
 `
 export const StyledRoom = styled.button`
+  align-items: center;
   background-color: transparent;
   border: none;
+  display: flex;
+  flex-flow: column;
+  justify-content: center;
   cursor: pointer;
   height: auto;
   width: auto;
@@ -79,18 +83,10 @@ const Dashboard = ({ state: { light } }) => {
   const [toggleModal, setModal] = useState(false)
   const [user, setUser] = useState(null)
 
-  const getCurrentUserData = async nick => {
-    await axios
-      .get(`${SERVER_DOMAIN}/users`, {
-        params: {
-          nick,
-        },
-      })
-      .then(res => setUser(res.data.user))
-      .catch(err => console.log(err))
-  }
-
   useEffect(() => {
+    const username = app.auth().currentUser.displayName
+    if (!username) router.push("/")
+    ctx.handleUser(username)
     setUser(app.auth().currentUser.displayName)
   }, [])
 
@@ -103,7 +99,7 @@ const Dashboard = ({ state: { light } }) => {
     <StyledWrapper themeState={light}>
       <Header />
       <StyledContentWrapper>
-        <StyledWelcome themeState={light}>Hello, {user}</StyledWelcome>
+        <StyledWelcome themeState={light}>Hello, {ctx.user}</StyledWelcome>
         <StyledRoomsGrid>
           <StyledRoom onClick={handleModal}>
             <StyledRoomImage>+</StyledRoomImage>

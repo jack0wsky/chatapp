@@ -51,11 +51,12 @@ const Hello = () => {
   const [password, setPassword] = useState("")
   const userContext = useContext(UserContext)
   const themeContext = useContext(ThemeContext)
+  const [loginError, setLoginError] = useState("")
   const [socketId, setID] = useState("")
 
   const router = useRouter()
 
-  const handleInput = (e: never): any => {
+  const handleInput = (e: any): any => {
     switch (e.target.name) {
       case "email": {
         setEmail(e.target.value)
@@ -77,13 +78,12 @@ const Hello = () => {
           .updateProfile({
             displayName: "Jacek",
           })
-          .then(res => {
-            console.log(res)
+          .then(() => {
             router.push("/dashboard")
           })
           .catch(err => console.log(err))
       })
-      .catch(err => console.log(err))
+      .catch(err => setLoginError(err.message))
   }
 
   const handleLogin = (e: any) => {
@@ -91,8 +91,10 @@ const Hello = () => {
     firebaseInit()
   }
 
+  const { state } = themeContext
+
   return (
-    <StyledWrapper themeState={themeContext.state.light}>
+    <StyledWrapper themeState={state.light}>
       <LoginForm>
         <Input
           onChange={handleInput}
@@ -111,6 +113,7 @@ const Hello = () => {
         <StyledSubmitButton type="submit" onClick={e => handleLogin(e)}>
           Login
         </StyledSubmitButton>
+        <p>{loginError}</p>
       </LoginForm>
     </StyledWrapper>
   )
