@@ -1,10 +1,11 @@
-import { useContext } from "react"
+import { useContext, useEffect } from "react"
 import { ThemeContext } from "@/context/themeContext"
 import styled from "styled-components"
 
 interface iProps {
   isUser: () => boolean
   themeState?: boolean
+  uploadTime?: string
 }
 
 const StyledContainer = styled.div<iProps>`
@@ -53,11 +54,20 @@ const StyledUserImg = styled.div<iProps>`
   width: 24px;
   height: 24px;
 `
+const StyledTime = styled.p`
+  color: #ddd;
+`
 
-const Message = ({ message, user, isUser }) => {
+const Message = ({ message, user, isUser, uploadTime }) => {
+  const getTime = () => {
+    const uploaded = new Date(uploadTime).getMinutes()
+    const now = new Date().getMinutes()
+    return now - uploaded
+  }
   const ctx = useContext(ThemeContext)
   return (
     <StyledContainer isUser={isUser} themeState={ctx.state}>
+      <StyledTime>{getTime()}</StyledTime>
       <StyledMessageContainer>
         <StyledUser isUser={isUser}>{user}</StyledUser>
         <StyledMessage isUser={isUser}>{message}</StyledMessage>

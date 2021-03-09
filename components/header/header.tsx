@@ -5,11 +5,11 @@ import {
 } from "@/components/header/header.styled"
 import withThemeContext from "@/context/themeContext"
 
-const Header = ({ handleTheme, state: { light } }) => {
+const Header = ({ handleTheme, state }) => {
   return (
-    <StyledContainer currentTheme={light}>
+    <StyledContainer currentTheme={state}>
       <StyledModeButton onClick={handleTheme} size="50px">
-        {light ? (
+        {state ? (
           <StyledIcon src="/sun-light.svg" alt="dark mode icon" />
         ) : (
           <StyledIcon src="/half-moon.svg" alt="light mode icon" />

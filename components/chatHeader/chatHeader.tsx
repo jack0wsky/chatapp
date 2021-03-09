@@ -1,3 +1,4 @@
+import { useRouter } from "next/router"
 import styled from "styled-components"
 
 type Props = {
@@ -16,6 +17,7 @@ const StyledWrapper = styled.div`
     0 91px 80px rgba(0, 0, 0, 0.07);
   align-items: center;
   display: flex;
+  grid-area: header;
   height: 80px;
   justify-content: space-between;
   padding: 0 5vw;
@@ -30,10 +32,22 @@ const StyledStatus = styled.p<StyledProps>`
   color: ${({ theme, themeStatus }) =>
     themeStatus ? theme.dark.text : theme.light.text};
 `
+const StyledReturnLink = styled.button`
+  border-radius: 50%;
+  height: 50px;
+  margin: 0 20px 0 0;
+  width: 50px;
+`
 
 const ChatHeader = ({ welcome, theme: themeStatus, chatStatus }: Props) => {
+  const { push } = useRouter()
+
+  const handleReturn = () => {
+    push("/dashboard")
+  }
   return (
     <StyledWrapper>
+      <StyledReturnLink onClick={handleReturn} />
       <StyledName themeStatus={themeStatus}>{welcome}</StyledName>
       <StyledStatus themeStatus={themeStatus}>{chatStatus}</StyledStatus>
     </StyledWrapper>

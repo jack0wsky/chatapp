@@ -23,16 +23,19 @@ type StyledProps = {
 
 const Friends = ({ friends, themeState }: Props) => {
   return (
-    <StyledContainer arrayLength={friends.length}>
-      {friends.map(({ name }) => {
-        return (
-          <StyledRoom key={name}>
-            <StyledRoomImage />
-            <RoomName themeState={themeState}>{name}</RoomName>
-          </StyledRoom>
-        )
-      })}
-    </StyledContainer>
+    <>
+      <StyledTitle>Friends</StyledTitle>
+      <StyledContainer arrayLength={friends.length}>
+        {friends.map(({ name }) => {
+          return (
+            <StyledRoom key={name}>
+              <StyledRoomImage />
+              <RoomName themeState={themeState}>{name}</RoomName>
+            </StyledRoom>
+          )
+        })}
+      </StyledContainer>
+    </>
   )
 }
 

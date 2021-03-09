@@ -77,17 +77,36 @@ const rooms = [
   { name: "Blinders", slug: "blinders" },
 ]
 
-const Dashboard = ({ state: { light } }) => {
+const Dashboard = ({ state }) => {
   const router = useRouter()
   const ctx = useContext(UserContext)
   const [toggleModal, setModal] = useState(false)
-  const [user, setUser] = useState(null)
+  const [userrname, setUsername] = useState(null)
+  const [friends, setFriends] = useState([])
+
+  const getUserFriends = async () => {
+    const email = app.auth().currentUser.email
+    await axios
+      .get(`${SERVER_DOMAIN}/users/${email}`)
+      .then(res => {
+        if (res.status === 200) setFriends(res.data.friends)
+      })
+      .catch(err => console.log(err))
+  }
 
   useEffect(() => {
-    const username = app.auth().currentUser.displayName
-    if (!username) router.push("/")
-    ctx.handleUser(username)
-    setUser(app.auth().currentUser.displayName)
+    if (app.auth().currentUser) {
+      const username = app.auth().currentUser.displayName
+      setUsername(username)
+      ctx.handleUser(username)
+    } else {
+      router.push("/")
+    }
+  }, [])
+
+  // @ts-ignore
+  useEffect(async () => {
+    await getUserFriends()
   }, [])
 
   const handleRoom = slug => {
@@ -96,20 +115,21 @@ const Dashboard = ({ state: { light } }) => {
   const handleModal = () => setModal(!toggleModal)
 
   return (
-    <StyledWrapper themeState={light}>
+    <StyledWrapper themeState={state}>
       <Header />
       <StyledContentWrapper>
-        <StyledWelcome themeState={light}>Hello, {ctx.user}</StyledWelcome>
+        <StyledWelcome themeState={state}>Hello, {ctx.user}</StyledWelcome>
+        <Friends friends={friends} themeState={state} />
         <StyledRoomsGrid>
           <StyledRoom onClick={handleModal}>
             <StyledRoomImage>+</StyledRoomImage>
-            <RoomName themeState={light}>Add new</RoomName>
+            <RoomName themeState={state}>Add new</RoomName>
           </StyledRoom>
           {rooms.map(({ name, slug }) => {
             return (
               <StyledRoom key={name} onClick={() => handleRoom(slug)}>
                 <StyledRoomImage />
-                <RoomName themeState={light}>{name}</RoomName>
+                <RoomName themeState={state}>{name}</RoomName>
               </StyledRoom>
             )
           })}

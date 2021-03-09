@@ -11,12 +11,14 @@ interface StyledProps {
 }
 
 const StyledWrapper = styled.section<StyledProps>`
-  background-color: ${({ theme, themeState }) =>
-    themeState ? theme.dark.background : theme.light.background};
   align-items: center;
   display: flex;
+  flex-flow: column;
+  background-color: ${({ theme, themeState }) =>
+    themeState ? theme.dark.background : theme.light.background};
   height: 100vh;
   justify-content: center;
+  position: relative;
   width: 100%;
 `
 const LoginForm = styled.form`
@@ -45,10 +47,23 @@ const StyledSubmitButton = styled.button`
     outline: none;
   }
 `
+const StyledSuccess = styled.div`
+  align-items: center;
+  background-color: #2cb121;
+  color: #fff;
+  display: flex;
+  height: 40px;
+  justify-content: center;
+  position: absolute;
+  top: 0;
+  width: 100%;
+`
 
 const Hello = () => {
   const [email, setEmail] = useState("")
   const [password, setPassword] = useState("")
+  const [username, setUsername] = useState("")
+  const [isLogged, setLogged] = useState(false)
   const userContext = useContext(UserContext)
   const themeContext = useContext(ThemeContext)
   const [loginError, setLoginError] = useState("")
@@ -66,6 +81,9 @@ const Hello = () => {
         setPassword(e.target.value)
         return
       }
+      case "username": {
+        setUsername(e.target.value)
+      }
     }
   }
 
@@ -73,10 +91,11 @@ const Hello = () => {
     Firebase.auth()
       .signInWithEmailAndPassword(email, password)
       .then(() => {
+        setLogged(true)
         const user = Firebase.auth().currentUser
         user
           .updateProfile({
-            displayName: "Jacek",
+            displayName: username,
           })
           .then(() => {
             router.push("/dashboard")
@@ -94,7 +113,8 @@ const Hello = () => {
   const { state } = themeContext
 
   return (
-    <StyledWrapper themeState={state.light}>
+    <StyledWrapper themeState={state}>
+      {isLogged && <StyledSuccess>Logged successfully</StyledSuccess>}
       <LoginForm>
         <Input
           onChange={handleInput}
@@ -102,6 +122,13 @@ const Hello = () => {
           value={email}
           type="text"
           name="email"
+        />
+        <Input
+          onChange={handleInput}
+          label="Username"
+          value={username}
+          type="text"
+          name="username"
         />
         <Input
           label="Password"

@@ -6,12 +6,20 @@ import UserContext from "@/context/context"
 import { ThemeContext } from "@/context/themeContext"
 import Message from "@/components/message/Message"
 import ChatHeader from "@/components/chatHeader/chatHeader"
+import SideMenu from "@/components/sideMenu/sideMenu"
 
 type StyledProps = {
   themeState: boolean
 }
+interface ContainerProps extends StyledProps {
+  toggleSideMenu: boolean
+}
 
-const StyledChatContainer = styled.section<StyledProps>`
+const StyledChatContainer = styled.section<ContainerProps>`
+  display: grid;
+  grid-template-areas: "header header header" "side-menu chat chat";
+  grid-template-columns: ${({ toggleSideMenu }) =>
+    toggleSideMenu ? `5vw 95vw` : "20vw 80vw"};
   background-color: ${({ theme, themeState }) =>
     themeState ? theme.dark.background : theme.light.background};
   height: 100vh;
@@ -20,6 +28,7 @@ const StyledChatContainer = styled.section<StyledProps>`
 const ChatWrapper = styled.div`
   display: flex;
   flex-flow: column;
+  grid-area: chat;
   height: 90%;
   width: 100%;
 `
@@ -68,10 +77,6 @@ const StyledSendButton = styled.button`
     outline: none;
   }
 `
-const StyledReturnLink = styled.button`
-  font-size: 1em;
-  margin: 0 20px 0 0;
-`
 
 export const StyledTitle = styled.h3``
 
@@ -82,6 +87,7 @@ const RoomTemplate = () => {
   const [message, setMessage] = useState("")
   const [messages, setMessages] = useState([])
   const [adminMessage, setAdminMessage] = useState("")
+  const [toggleSideMenu, setSideMenu] = useState(false)
   const ctx = useContext(UserContext)
   const themeCtx = useContext(ThemeContext)
 
@@ -100,10 +106,8 @@ const RoomTemplate = () => {
     socket.on("message", msg => {
       setMessages(prevState => [...prevState, msg])
     })
-    console.log(messages)
   }, [])
 
-  // TODO add timestamp
   const sendMessage = e => {
     e.preventDefault()
     const timestamp = new Date()
@@ -118,16 +122,21 @@ const RoomTemplate = () => {
   const handleMessage = e => {
     setMessage(e.target.value)
   }
-  const handleReturn = () => {
-    router.push("/dashboard")
-  }
+  const handleSideMenu = () => setSideMenu(!toggleSideMenu)
 
   return (
-    <StyledChatContainer themeState={themeCtx.state}>
+    <StyledChatContainer
+      toggleSideMenu={toggleSideMenu}
+      themeState={themeCtx.state}
+    >
       <ChatHeader
         theme={themeCtx.state}
         welcome={welcome}
         chatStatus={adminMessage}
+      />
+      <SideMenu
+        handleSideMenu={handleSideMenu}
+        toggleSideMenu={toggleSideMenu}
       />
       <ChatWrapper>
         <Messages>
@@ -138,6 +147,7 @@ const RoomTemplate = () => {
                 message={message}
                 user={name}
                 isUser={name === ctx.user}
+                uploadTime={timestamp}
               />
             )
           })}

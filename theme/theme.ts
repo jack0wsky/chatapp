@@ -6,7 +6,7 @@ export const theme = {
     cta: "#003EB1",
     warning: "#E73D23",
     white: "#fff",
-    userMessage: "#008e94",
+    userMessage: "#1f1f1f",
   },
   dark: {
     background: "#353535",
