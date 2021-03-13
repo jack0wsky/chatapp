@@ -1,0 +1,22 @@
+.field {
+  display: flex;
+  flex-flow: column;
+  height: auto;
+  max-width: 300px;
+  width: auto;
+}
+
+.field__label {
+  margin: 0 0 5px 10px;
+}
+
+.field__input {
+  border: 1px solid #ddd;
+  border-radius: 8px;
+  font-size: 1em;
+  padding: 10px;
+
+  &:focus {
+    outline: none;
+  }
+}

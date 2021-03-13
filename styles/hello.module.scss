@@ -1,0 +1,50 @@
+.container {
+  align-items: center;
+  display: flex;
+  flex-flow: column;
+  background-color: var(--background);
+  height: 100vh;
+  justify-content: center;
+  position: relative;
+  width: 100%;
+}
+
+.form {
+  background-color: #ddd;
+  display: grid;
+  grid-row-gap: 20px;
+  grid-template-rows: repeat(3, 1fr);
+  height: auto;
+  min-height: 40px;
+  padding: 50px;
+  min-width: 20%;
+  width: auto;
+}
+
+.submit {
+  background-color: var(--cta);
+  border: none;
+  border-radius: 8px;
+  color: var(--white);
+  cursor: pointer;
+  font-size: 1em;
+  height: max-content;
+  padding: 15px 20px;
+  width: 100%;
+
+  &:focus {
+    outline: none;
+  }
+}
+
+.success {
+  align-items: center;
+  background-color: var(--success);
+  color: var(--white);
+  display: flex;
+  height: 40px;
+  justify-content: center;
+  position: absolute;
+  top: 0;
+  width: 100%;
+}

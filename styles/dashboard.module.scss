@@ -1,0 +1,57 @@
+.container {
+  background-color: var(--background);
+  height: 100vh;
+  position: relative;
+  width: 100%;
+}
+
+.welcome {
+  color: var(--text);
+  font-size: 2.5em;
+  font-weight: 400;
+}
+
+.roomsGrid {
+  display: grid;
+  grid-column-gap: 30px;
+  grid-template-columns: repeat(3, 1fr);
+  height: auto;
+  margin: 30px 0 0;
+  min-height: 100px;
+  width: max-content;
+}
+.room {
+  align-items: center;
+  background-color: transparent;
+  border: none;
+  display: flex;
+  flex-flow: column;
+  justify-content: center;
+  cursor: pointer;
+  height: auto;
+  width: auto;
+
+  &:focus {
+    outline: none;
+  }
+}
+
+.roomImage {
+  align-items: center;
+  background-color: #ddd;
+  border-radius: 50%;
+  display: flex;
+  height: 70px;
+  justify-content: center;
+  width: 70px;
+}
+.roomName {
+  color: var(--text);
+  margin: 10px 0 0;
+}
+.contentWrapper {
+  height: auto;
+  min-height: 60vh;
+  padding: 0 5vw;
+  width: 100%;
+}

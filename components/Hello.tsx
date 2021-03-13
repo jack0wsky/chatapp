@@ -1,68 +1,22 @@
 import { useState, useContext } from "react"
 import { useRouter } from "next/router"
 import { ThemeContext } from "@/context/themeContext"
-import styled from "styled-components"
 import Input from "@/components/input/input"
 import UserContext from "@/context/context"
 import Firebase from "@/constants/firebase"
+import style from "@/styles/hello.module.scss"
 
-interface StyledProps {
-  themeState: boolean
-}
-
-const StyledWrapper = styled.section<StyledProps>`
-  align-items: center;
-  display: flex;
-  flex-flow: column;
-  background-color: ${({ theme, themeState }) =>
-    themeState ? theme.dark.background : theme.light.background};
-  height: 100vh;
-  justify-content: center;
-  position: relative;
-  width: 100%;
-`
-const LoginForm = styled.form`
-  background-color: #ddd;
-  display: grid;
-  grid-row-gap: 20px;
-  grid-template-rows: repeat(3, 1fr);
-  height: auto;
-  min-height: 40px;
-  padding: 50px;
-  min-width: 20%;
-  width: auto;
-`
-const StyledSubmitButton = styled.button`
-  background-color: ${({ theme }) => theme.light.cta};
-  border: none;
-  border-radius: 8px;
-  color: #fff;
-  cursor: pointer;
-  font-size: 1em;
-  height: max-content;
-  padding: 15px 20px;
-  width: 100%;
-
-  &:focus {
-    outline: none;
-  }
-`
-const StyledSuccess = styled.div`
-  align-items: center;
-  background-color: #2cb121;
-  color: #fff;
-  display: flex;
-  height: 40px;
-  justify-content: center;
-  position: absolute;
-  top: 0;
-  width: 100%;
-`
+const formStates = Object.freeze({
+  default: "Login",
+  sending: "Logging in...",
+  success: "Succes!",
+})
 
 const Hello = () => {
   const [email, setEmail] = useState("")
   const [password, setPassword] = useState("")
   const [username, setUsername] = useState("")
+  const [submitButton, setSubmitButton] = useState(formStates.default)
   const [isLogged, setLogged] = useState(false)
   const userContext = useContext(UserContext)
   const themeContext = useContext(ThemeContext)
@@ -92,30 +46,34 @@ const Hello = () => {
       .signInWithEmailAndPassword(email, password)
       .then(() => {
         setLogged(true)
+        setSubmitButton(formStates.success)
         const user = Firebase.auth().currentUser
         user
           .updateProfile({
             displayName: username,
           })
           .then(() => {
+            userContext.setUser(user)
             router.push("/dashboard")
           })
           .catch(err => console.log(err))
       })
-      .catch(err => setLoginError(err.message))
+      .catch(err => {
+        setSubmitButton(formStates.default)
+        setLoginError(err.message)
+      })
   }
 
   const handleLogin = (e: any) => {
     e.preventDefault()
+    setSubmitButton(formStates.sending)
     firebaseInit()
   }
 
-  const { state } = themeContext
-
   return (
-    <StyledWrapper themeState={state}>
-      {isLogged && <StyledSuccess>Logged successfully</StyledSuccess>}
-      <LoginForm>
+    <section className={style.container}>
+      {isLogged && <div className={style.success}>Logged successfully</div>}
+      <form className={style.form}>
         <Input
           onChange={handleInput}
           label="E-mail"
@@ -137,12 +95,12 @@ const Hello = () => {
           type="password"
           name="password"
         />
-        <StyledSubmitButton type="submit" onClick={e => handleLogin(e)}>
-          Login
-        </StyledSubmitButton>
+        <button className={style.submit} type="submit" onClick={handleLogin}>
+          {submitButton}
+        </button>
         <p>{loginError}</p>
-      </LoginForm>
-    </StyledWrapper>
+      </form>
+    </section>
   )
 }
 
