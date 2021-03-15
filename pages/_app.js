@@ -1,14 +1,11 @@
-import Provider from "@/context/provider"
-import { ContextThemeProvider } from "@/context/themeContext"
+import Provider from "@/context/provider.tsx"
 import "@/styles/global.scss"
 
 const MyApp = ({ Component, pageProps }) => {
   return (
     <>
       <Provider>
-        <ContextThemeProvider>
-          <Component {...pageProps} />
-        </ContextThemeProvider>
+        <Component {...pageProps} />
       </Provider>
     </>
   )

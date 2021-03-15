@@ -3,14 +3,14 @@
   flex-flow: column;
   height: auto;
   max-width: 300px;
-  width: auto;
+  width: 30vw;
 }
 
-.field__label {
+.fieldLabel {
   margin: 0 0 5px 10px;
 }
 
-.field__input {
+.fieldInput {
   border: 1px solid #ddd;
   border-radius: 8px;
   font-size: 1em;
@@ -19,4 +19,9 @@
   &:focus {
     outline: none;
   }
+}
+
+.fieldError {
+  height: 20px;
+  color: var(--warning);
 }

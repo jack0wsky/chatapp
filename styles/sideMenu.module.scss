@@ -1,0 +1,11 @@
+.container {
+  background-color: var(--lightBg);
+  grid-area: side-menu;
+  height: 100%;
+  width: 100%;
+}
+
+.toggleButton {
+  height: 40px;
+  width: 40px;
+}

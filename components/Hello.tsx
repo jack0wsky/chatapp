@@ -1,10 +1,11 @@
 import { useState, useContext } from "react"
 import { useRouter } from "next/router"
-import { ThemeContext } from "@/context/themeContext"
 import Input from "@/components/input/input"
 import UserContext from "@/context/context"
 import Firebase from "@/constants/firebase"
 import style from "@/styles/hello.module.scss"
+import { validateLogin } from "@/services/loginValidation"
+import { FormFields } from "@/utils/formFields"
 
 const formStates = Object.freeze({
   default: "Login",
@@ -16,32 +17,36 @@ const Hello = () => {
   const [email, setEmail] = useState("")
   const [password, setPassword] = useState("")
   const [username, setUsername] = useState("")
+
+  const [fieldErrors, setFieldErrors] = useState([])
   const [submitButton, setSubmitButton] = useState(formStates.default)
   const [isLogged, setLogged] = useState(false)
+
   const userContext = useContext(UserContext)
-  const themeContext = useContext(ThemeContext)
   const [loginError, setLoginError] = useState("")
-  const [socketId, setID] = useState("")
 
   const router = useRouter()
 
   const handleInput = (e: any): any => {
-    switch (e.target.name) {
-      case "email": {
-        setEmail(e.target.value)
+    const { name, value } = e.target
+
+    switch (name) {
+      case FormFields.email: {
+        setEmail(value)
         return
       }
-      case "password": {
-        setPassword(e.target.value)
+      case FormFields.password: {
+        setPassword(value)
         return
       }
-      case "username": {
-        setUsername(e.target.value)
+      case FormFields.username: {
+        setUsername(value)
       }
     }
   }
 
   const firebaseInit = () => {
+    setSubmitButton(formStates.sending)
     Firebase.auth()
       .signInWithEmailAndPassword(email, password)
       .then(() => {
@@ -66,8 +71,9 @@ const Hello = () => {
 
   const handleLogin = (e: any) => {
     e.preventDefault()
-    setSubmitButton(formStates.sending)
-    firebaseInit()
+    const errors = validateLogin({ email, username, password })
+    setFieldErrors(errors)
+    if (errors.length === 0) firebaseInit()
   }
 
   return (
@@ -79,26 +85,29 @@ const Hello = () => {
           label="E-mail"
           value={email}
           type="text"
-          name="email"
+          name={FormFields.email}
+          errors={fieldErrors}
         />
         <Input
           onChange={handleInput}
           label="Username"
           value={username}
           type="text"
-          name="username"
+          name={FormFields.username}
+          errors={fieldErrors}
         />
         <Input
           label="Password"
           onChange={handleInput}
           value={password}
           type="password"
-          name="password"
+          name={FormFields.password}
+          errors={fieldErrors}
         />
         <button className={style.submit} type="submit" onClick={handleLogin}>
           {submitButton}
         </button>
-        <p>{loginError}</p>
+        <p className={style.error}>{loginError}</p>
       </form>
     </section>
   )

@@ -1,0 +1,67 @@
+.container {
+  display: grid;
+  grid-template-areas: "header header header" "side-menu chat chat";
+  grid-template-rows: 80px calc(100vh - 80px);
+  grid-template-columns: 5vw 95vw;
+  background-color: var(--background);
+  height: 100%;
+  width: 80%;
+}
+
+.chatWrapper {
+  display: flex;
+  flex-flow: column;
+  grid-area: chat;
+  height: 90%;
+  width: 100%;
+}
+
+.containerToggle {
+  grid-template-columns: 20vw 80vw;
+}
+
+.messages {
+  display: flex;
+  flex-flow: column;
+  height: 95vh;
+  min-height: 60vh;
+  overflow-y: auto;
+  width: 100%;
+}
+
+.writeBox {
+  color: var(--white);
+  justify-self: flex-end;
+  display: flex;
+  height: 5vh;
+  min-height: 60px;
+  width: 100%;
+}
+
+.input {
+  background-color: var(--lightBg);
+  border: var(--lightBg);
+  border-radius: 50px;
+  font-size: 1em;
+  height: 44px;
+  margin: 0 20px;
+  padding: 20px;
+  width: 60%;
+
+  &:focus {
+    outline: none;
+  }
+}
+
+.sendButton {
+  color: var(--white);
+  background-color: var(--cta);
+  border-radius: 50px;
+  height: 44px;
+  padding: 0 20px;
+  width: max-content;
+}
+
+.title {
+
+}

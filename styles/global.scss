@@ -16,3 +16,12 @@
   --userMessage: #008e94;
   --success: #2cb121;
 }
+
+button {
+  border: none;
+  cursor: pointer;
+
+  &:focus {
+    outline: none;
+  }
+}

@@ -21,7 +21,9 @@
       "@/functions/*": ["functions/*"],
       "@/constants/*": ["constants/*"],
       "@/pages/*": ["pages/*"],
-      "@/styles/*": ["styles/*"]
+      "@/styles/*": ["styles/*"],
+      "@/services/*": ["services/*"],
+      "@/utils/*": ["utils/*"]
     }
   },
   "include": ["next-env.d.ts", "**/*.ts", "**/*.tsx"],

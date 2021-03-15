@@ -1,21 +1,17 @@
-import {
-  StyledContainer,
-  StyledModeButton,
-  StyledIcon,
-} from "@/components/header/header.styled"
+import styles from "@/styles/header.module.scss"
 import withThemeContext from "@/context/themeContext"
 
 const Header = ({ handleTheme, state }) => {
   return (
-    <StyledContainer currentTheme={state}>
-      <StyledModeButton onClick={handleTheme} size="50px">
+    <header className={styles.container}>
+      <button className={styles.toggleTheme} onClick={handleTheme}>
         {state ? (
-          <StyledIcon src="/sun-light.svg" alt="dark mode icon" />
+          <img src="/sun-light.svg" alt="dark mode icon" />
         ) : (
-          <StyledIcon src="/half-moon.svg" alt="light mode icon" />
+          <img src="/half-moon.svg" alt="light mode icon" />
         )}
-      </StyledModeButton>
-    </StyledContainer>
+      </button>
+    </header>
   )
 }
 

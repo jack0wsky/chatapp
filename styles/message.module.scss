@@ -1,0 +1,57 @@
+.container {
+  align-items: flex-end;
+  background-color: transparent;
+  display: flex;
+  flex-flow: row-reverse;
+  align-self: flex-start;
+  height: max-content;
+  padding: 10px;
+  min-height: 50px;
+  width: auto;
+  min-width: 30px;
+}
+
+.isMyMessage {
+  flex-flow: row;
+  align-self: flex-end;
+}
+
+.messageContainer {
+  display: flex;
+  flex-flow: column;
+  height: auto;
+  width: auto;
+}
+
+.message {
+  background-color: var(--userMessage);
+  border: 1px solid #ddd;
+  border-radius: 50px;
+  color: #000;
+  height: max-content;
+  padding: 10px 20px;
+  min-width: 20px;
+  max-width: 85ch;
+  width: max-content;
+}
+
+.user {
+  align-self: flex-start;
+  display: flex;
+  color: #a4a4a4;
+  font-size: 0.7em;
+  margin: 0 15px 5px 0;
+}
+
+.userImg {
+  display: flex;
+  background-color: #ddd;
+  border-radius: 50px;
+  margin: 0 0 0 10px;
+  width: 24px;
+  height: 24px;
+}
+
+.time {
+  color: #ddd;
+}

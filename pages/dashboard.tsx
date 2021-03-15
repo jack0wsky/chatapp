@@ -10,8 +10,7 @@ import axios from "axios"
 import { SERVER_DOMAIN } from "@/constants/index"
 import app from "@/constants/firebase"
 import style from "@/styles/dashboard.module.scss"
-
-const rooms = []
+import HTMLHead from "@/components/htmlHead/htmlHead"
 
 const Dashboard = ({ state }) => {
   const router = useRouter()
@@ -30,18 +29,12 @@ const Dashboard = ({ state }) => {
       .catch(err => console.log(err))
   }
 
-  useEffect(() => {
+  useEffect(async () => {
     if (app.auth().currentUser) {
       const username = app.auth().currentUser.displayName
+      await getUserFriends()
       setUsername(username)
-    } else {
-      router.push("/")
     }
-  }, [])
-
-  // @ts-ignore
-  useEffect(async () => {
-    // await getUserFriends()
   }, [])
 
   const handleRoom = slug => {
@@ -59,8 +52,11 @@ const Dashboard = ({ state }) => {
     roomName,
   } = style
 
+  if (!ctx.user) router.push("/")
   return (
     <main className={container}>
+      <HTMLHead title={`Hello, ${ctx.user.displayName} - Dashboard`} />
+      <Header />
       <section className={contentWrapper}>
         <div className={welcome}>Hello, {ctx.user.displayName}</div>
         <div className={roomsGrid}>
