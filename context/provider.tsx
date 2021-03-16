@@ -20,7 +20,7 @@ class Provider extends Component<IState> {
     ],
     theme: false,
   }
-  setUser = (user: unknown) => this.setState({ user })
+  setUser = user => this.setState({ user })
 
   toggleTheme = () => {
     this.setState((prevState: Record<string, unknown>) => ({

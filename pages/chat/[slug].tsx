@@ -16,47 +16,48 @@ const RoomTemplate = () => {
   const [adminMessage, setAdminMessage] = useState("")
   const [toggleSideMenu, setSideMenu] = useState(false)
   const ctx = useContext(Context)
+  const [user, setUser] = useState(ctx.user.displayName)
 
   useEffect(() => {
-    socket.emit("join", { name: ctx.user, slug: router.query.slug })
+    socket.emit("join", { name: user, slug: router.query.slug })
     socket.on("helloMessage", ({ text }) => setWelcome(text))
     socket.on("globalMessage", ({ text }) => setAdminMessage(text))
   }, [])
 
   useEffect(() => {
     socket.on("message", msg => {
+      console.log(msg)
       setMessages(prevState => [...prevState, msg])
     })
-  }, [])
+  }, [messages])
 
   const sendMessage = e => {
     e.preventDefault()
     const timestamp = new Date()
     socket.emit("sendMessage", {
-      name: ctx.user,
+      name: ctx.user.displayName,
       room: router.query.slug,
       message,
       timestamp,
     })
     setMessage("")
   }
-  const handleMessage = e => setMessage(e.target.value)
+
+  const onEnter = e => {
+    if (e.key === "Enter") sendMessage(e)
+  }
 
   const handleSideMenu = () => setSideMenu(!toggleSideMenu)
+
+  const { container, containerToggle } = styles
 
   return (
     <main
       className={
-        toggleSideMenu
-          ? `${styles.container} ${styles.containerToggle}`
-          : `${styles.container}`
+        toggleSideMenu ? `${container} ${containerToggle}` : `${container}`
       }
     >
-      <ChatHeader
-        theme={ctx.theme}
-        welcome={welcome}
-        chatStatus={adminMessage}
-      />
+      <ChatHeader welcome={welcome} chatStatus={adminMessage} />
       <SideMenu
         handleSideMenu={handleSideMenu}
         toggleSideMenu={toggleSideMenu}
@@ -69,7 +70,7 @@ const RoomTemplate = () => {
                 key={timestamp}
                 message={message}
                 user={name}
-                isUser={name === ctx.user}
+                isCurrentUser={name === user}
                 uploadTime={timestamp}
               />
             )
@@ -79,9 +80,10 @@ const RoomTemplate = () => {
           <input
             className={styles.input}
             value={message}
-            onChange={e => handleMessage(e)}
+            onChange={e => setMessage(e.target.value)}
             placeholder="Write..."
             type="text"
+            onKeyPress={onEnter}
           />
           <button className={styles.sendButton} onClick={sendMessage}>
             Send

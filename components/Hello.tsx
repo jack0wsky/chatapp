@@ -1,11 +1,14 @@
-import { useState, useContext } from "react"
+import { useState, useContext, useEffect } from "react"
 import { useRouter } from "next/router"
 import Input from "@/components/input/input"
-import UserContext from "@/context/context"
+import Context from "@/context/context"
+import firebase from "firebase/app"
+import "firebase/auth"
 import Firebase from "@/constants/firebase"
 import style from "@/styles/hello.module.scss"
 import { validateLogin } from "@/services/loginValidation"
 import { FormFields } from "@/utils/formFields"
+import { credentials } from "@grpc/grpc-js"
 
 const formStates = Object.freeze({
   default: "Login",
@@ -22,7 +25,7 @@ const Hello = () => {
   const [submitButton, setSubmitButton] = useState(formStates.default)
   const [isLogged, setLogged] = useState(false)
 
-  const userContext = useContext(UserContext)
+  const ctx = useContext(Context)
   const [loginError, setLoginError] = useState("")
 
   const router = useRouter()
@@ -45,6 +48,17 @@ const Hello = () => {
     }
   }
 
+  const loginWithPersistence = async () => {
+    await Firebase.auth()
+      .setPersistence(firebase.auth.Auth.Persistence.SESSION)
+      .then(() => {
+        return firebaseInit()
+      })
+      .catch(err => {
+        console.log(err)
+      })
+  }
+
   const firebaseInit = () => {
     setSubmitButton(formStates.sending)
     Firebase.auth()
@@ -57,8 +71,9 @@ const Hello = () => {
           .updateProfile({
             displayName: username,
           })
-          .then(() => {
-            userContext.setUser(user)
+          .then(async () => {
+            const { setUser }: unknown = ctx
+            setUser(user)
             router.push("/dashboard")
           })
           .catch(err => console.log(err))
@@ -69,11 +84,11 @@ const Hello = () => {
       })
   }
 
-  const handleLogin = (e: any) => {
+  const handleLogin = async (e: any) => {
     e.preventDefault()
     const errors = validateLogin({ email, username, password })
     setFieldErrors(errors)
-    if (errors.length === 0) firebaseInit()
+    if (errors.length === 0) await loginWithPersistence()
   }
 
   return (

@@ -1,40 +1,33 @@
-import styled from "styled-components"
 import React from "react"
-import { RoomName, StyledRoom, StyledRoomImage } from "@/pages/dashboard"
-import { StyledTitle } from "@/pages/chat/[slug]"
-
-const StyledContainer = styled.section<StyledProps>`
-  align-items: center;
-  display: grid;
-  grid-column-gap: 20px;
-  grid-template-columns: repeat(${({ arrayLength }) => arrayLength}, 100px);
-  height: 100px;
-  margin: 30px 0;
-  width: 50%;
-`
+import dashboardStyles from "@/styles/dashboard.module.scss"
+import chatStyles from "@/styles/chat.module.scss"
+import styles from "@/styles/friends.module.scss"
 
 type Props = {
   friends: any
   themeState: boolean
 }
-type StyledProps = {
-  arrayLength: number
-}
+
+const { room, roomImage, roomName } = dashboardStyles
+const { title } = chatStyles
 
 const Friends = ({ friends, themeState }: Props) => {
   return (
     <>
-      <StyledTitle>Friends</StyledTitle>
-      <StyledContainer arrayLength={friends.length}>
+      <h2 className={title}>Friends</h2>
+      <section
+        className={styles.container}
+        style={{ gridTemplateColumns: `repeat(${friends.length}, 100px)` }}
+      >
         {friends.map(({ name }) => {
           return (
-            <StyledRoom key={name}>
-              <StyledRoomImage />
-              <RoomName themeState={themeState}>{name}</RoomName>
-            </StyledRoom>
+            <div className={room} key={name}>
+              <div className={roomImage} />
+              <p className={roomName}>{name}</p>
+            </div>
           )
         })}
-      </StyledContainer>
+      </section>
     </>
   )
 }

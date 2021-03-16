@@ -1,26 +1,58 @@
-import { useContext } from "react"
-import Context from "@/context/context"
+import { useEffect } from "react"
 import styles from "@/styles/message.module.scss"
 
 interface iProps {
-  isUser: () => boolean
+  isCurrentUser: boolean
   themeState?: boolean
   uploadTime?: string
+  message: string
+  user: string
 }
 
-const Message = ({ message, user, isUser, uploadTime }) => {
+const Message = ({ message, user, isCurrentUser, uploadTime }: iProps) => {
   const getTime = () => {
     const uploaded = new Date(uploadTime).getMinutes()
     const now = new Date().getMinutes()
-    return now - uploaded
+    if (now - uploaded === 0) return "now"
+    return `${now - uploaded}m`
   }
-  const ctx = useContext(Context)
+
+  useEffect(() => {
+    setInterval(() => {
+      getTime()
+    }, 60000)
+  }, [])
+
+  const {
+    container,
+    isMyMessage,
+    message: messageStyle,
+    messageContainer,
+    strangerMessageContainer,
+    user: userStyle,
+  } = styles
+
+  const conditionalClass = (className, modifier) => {
+    return isCurrentUser ? `${className} ${modifier}` : `${className}`
+  }
+
   return (
-    <div className={styles.container}>
+    <div className={conditionalClass(container, isMyMessage)}>
       <p className={styles.time}>{getTime()}</p>
-      <div className={styles.messageContainer}>
-        <p className={styles.user}>{user}</p>
-        <p className={styles.message}>{message}</p>
+      <div
+        className={conditionalClass(messageContainer, strangerMessageContainer)}
+      >
+        <p className={conditionalClass(userStyle, styles["user--isMe"])}>
+          {user}
+        </p>
+        <p
+          className={conditionalClass(
+            messageStyle,
+            styles["message--stranger"]
+          )}
+        >
+          {message}
+        </p>
       </div>
     </div>
   )

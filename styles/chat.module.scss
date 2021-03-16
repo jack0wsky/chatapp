@@ -9,10 +9,11 @@
 }
 
 .chatWrapper {
+  background-color: var(--background);
   display: flex;
   flex-flow: column;
   grid-area: chat;
-  height: 90%;
+  height: 100%;
   width: 100%;
 }
 
@@ -24,8 +25,8 @@
   display: flex;
   flex-flow: column;
   height: 95vh;
-  min-height: 60vh;
-  overflow-y: auto;
+  min-height: 70vh;
+  overflow-y: scroll;
   width: 100%;
 }
 

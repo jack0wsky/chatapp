@@ -1,20 +1,19 @@
 import React, { useContext, useEffect, useState } from "react"
-import UserContext from "@/context/context"
 import { useRouter } from "next/router"
 import CreateRoom from "@/components/createRoom/createRoom"
 import Modal from "@/components/hoc/withModal"
 import Friends from "@/components/friends/friends"
 import Header from "@/components/header/header"
-import withThemeContext from "@/context/themeContext"
+import Context from "@/context/context"
 import axios from "axios"
 import { SERVER_DOMAIN } from "@/constants/index"
 import app from "@/constants/firebase"
 import style from "@/styles/dashboard.module.scss"
 import HTMLHead from "@/components/htmlHead/htmlHead"
 
-const Dashboard = ({ state }) => {
+const Dashboard = () => {
   const router = useRouter()
-  const ctx = useContext(UserContext)
+  const ctx = useContext(Context)
   const [toggleModal, setModal] = useState(false)
   const [userrname, setUsername] = useState(null)
   const [friends, setFriends] = useState([])
@@ -29,17 +28,22 @@ const Dashboard = ({ state }) => {
       .catch(err => console.log(err))
   }
 
+  const redirect = dir => router.push(dir)
+
   useEffect(async () => {
-    if (app.auth().currentUser) {
+    if (ctx.user) {
       const username = app.auth().currentUser.displayName
       await getUserFriends()
       setUsername(username)
+    } else {
+      redirect("/")
     }
-  }, [])
+  }, [ctx.user])
 
   const handleRoom = slug => {
-    router.push(`/chat/${slug}`)
+    redirect(`/chat/${slug}`)
   }
+
   const handleModal = () => setModal(!toggleModal)
 
   const {
@@ -52,13 +56,16 @@ const Dashboard = ({ state }) => {
     roomName,
   } = style
 
-  if (!ctx.user) router.push("/")
+  const displayName = ctx.user && ctx.user.displayName
+
   return (
     <main className={container}>
-      <HTMLHead title={`Hello, ${ctx.user.displayName} - Dashboard`} />
+      <HTMLHead
+        title={`Hello, ${ctx.user ? displayName : "Jacek"} - Dashboard`}
+      />
       <Header />
       <section className={contentWrapper}>
-        <div className={welcome}>Hello, {ctx.user.displayName}</div>
+        <div className={welcome}>Hello, {ctx.user && displayName}</div>
         <div className={roomsGrid}>
           <div className={room} onClick={handleModal}>
             <div className={roomImage}>+</div>
@@ -83,4 +90,4 @@ const Dashboard = ({ state }) => {
   )
 }
 
-export default withThemeContext(Dashboard)
+export default Dashboard

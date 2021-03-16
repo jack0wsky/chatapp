@@ -1,11 +1,14 @@
+import { useContext } from "react"
 import styles from "@/styles/header.module.scss"
-import withThemeContext from "@/context/themeContext"
+import Context from "@/context/context"
 
-const Header = ({ handleTheme, state }) => {
+const Header = () => {
+  const ctx = useContext(Context)
+
   return (
     <header className={styles.container}>
-      <button className={styles.toggleTheme} onClick={handleTheme}>
-        {state ? (
+      <button className={styles.toggleTheme} onClick={ctx.toggleTheme}>
+        {ctx.theme ? (
           <img src="/sun-light.svg" alt="dark mode icon" />
         ) : (
           <img src="/half-moon.svg" alt="light mode icon" />
@@ -15,4 +18,4 @@ const Header = ({ handleTheme, state }) => {
   )
 }
 
-export default withThemeContext(Header)
+export default Header
