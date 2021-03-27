@@ -1,6 +1,5 @@
 import React, { useContext, useEffect, useState } from "react"
 import { useRouter } from "next/router"
-import CreateRoom from "~/components/createRoom/createRoom"
 import Modal from "~/components/hoc/withModal"
 import Friends from "~/components/friends/friends"
 import Header from "~/components/header/header"
@@ -82,11 +81,6 @@ const Dashboard: React.FC = () => {
             )
           })}
         </div>
-        {toggleModal && (
-          <Modal>
-            <CreateRoom toggleModal={toggleModal} closeModal={handleModal} />
-          </Modal>
-        )}
       </section>
     </main>
   )
