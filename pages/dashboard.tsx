@@ -1,6 +1,5 @@
 import React, { useContext, useEffect, useState } from "react"
 import { useRouter } from "next/router"
-import Modal from "~/components/hoc/withModal"
 import Friends from "~/components/friends/friends"
 import Header from "~/components/header/header"
 import Context from "~/context/context"
