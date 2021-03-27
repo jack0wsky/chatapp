@@ -15,15 +15,16 @@
     "jsx": "preserve",
     "baseUrl": ".",
     "paths": {
-      "@/components/*": ["components/*"],
-      "@/theme/*": ["theme/*"],
-      "@/context/*": ["context/*"],
-      "@/functions/*": ["functions/*"],
-      "@/constants/*": ["constants/*"],
-      "@/pages/*": ["pages/*"],
-      "@/styles/*": ["styles/*"],
-      "@/services/*": ["services/*"],
-      "@/utils/*": ["utils/*"]
+      "~/components/*": ["components/*"],
+      "~/theme/*": ["theme/*"],
+      "~/context/*": ["context/*"],
+      "~/functions/*": ["functions/*"],
+      "~/constants/*": ["constants/*"],
+      "~/pages/*": ["pages/*"],
+      "~/styles/*": ["styles/*"],
+      "~/services/*": ["services/*"],
+      "~/utils/*": ["utils/*"],
+      "~/layouts/*": ["layouts/*"]
     }
   },
   "include": ["next-env.d.ts", "**/*.ts", "**/*.tsx"],

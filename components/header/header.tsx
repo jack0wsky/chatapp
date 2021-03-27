@@ -1,6 +1,6 @@
 import { useContext } from "react"
-import styles from "@/styles/header.module.scss"
-import Context from "@/context/context"
+import styles from "~/styles/header.module.scss"
+import Context from "~/context/context"
 
 const Header = () => {
   const ctx = useContext(Context)

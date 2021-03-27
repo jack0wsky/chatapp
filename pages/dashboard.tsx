@@ -1,25 +1,25 @@
 import React, { useContext, useEffect, useState } from "react"
 import { useRouter } from "next/router"
-import CreateRoom from "@/components/createRoom/createRoom"
-import Modal from "@/components/hoc/withModal"
-import Friends from "@/components/friends/friends"
-import Header from "@/components/header/header"
-import Context from "@/context/context"
+import CreateRoom from "~/components/createRoom/createRoom"
+import Modal from "~/components/hoc/withModal"
+import Friends from "~/components/friends/friends"
+import Header from "~/components/header/header"
+import Context from "~/context/context"
 import axios from "axios"
-import { SERVER_DOMAIN } from "@/constants/index"
-import app from "@/constants/firebase"
-import style from "@/styles/dashboard.module.scss"
-import HTMLHead from "@/components/htmlHead/htmlHead"
+import { SERVER_DOMAIN } from "~/constants/index"
+import app from "~/constants/firebase"
+import style from "~/styles/dashboard.module.scss"
+import HTMLHead from "~/components/htmlHead/htmlHead"
 
-const Dashboard = () => {
+const Dashboard: React.FC = () => {
   const router = useRouter()
   const ctx = useContext(Context)
   const [toggleModal, setModal] = useState(false)
-  const [userrname, setUsername] = useState(null)
   const [friends, setFriends] = useState([])
 
   const getUserFriends = async () => {
     const email = app.auth().currentUser.email
+    console.log(app.auth().currentUser)
     await axios
       .get(`${SERVER_DOMAIN}/users/${email}`)
       .then(res => {
@@ -30,19 +30,21 @@ const Dashboard = () => {
 
   const redirect = dir => router.push(dir)
 
-  useEffect(async () => {
-    if (ctx.user) {
-      const username = app.auth().currentUser.displayName
-      await getUserFriends()
-      setUsername(username)
-    } else {
-      redirect("/")
-    }
+  useEffect(() => {
+    console.log(app)
+    app.auth().onAuthStateChanged(user => {
+      if (user) {
+        ctx.setUser(user.displayName)
+        console.log(user)
+      }
+    })
+  }, [app])
+
+  useEffect(() => {
+    if (!ctx.user) redirect("/")
   }, [ctx.user])
 
-  const handleRoom = slug => {
-    redirect(`/chat/${slug}`)
-  }
+  const handleRoom = slug => redirect(`/chat/${slug}`)
 
   const handleModal = () => setModal(!toggleModal)
 
@@ -56,7 +58,7 @@ const Dashboard = () => {
     roomName,
   } = style
 
-  const displayName = ctx.user && ctx.user.displayName
+  const displayName = ctx.user && ctx.user
 
   return (
     <main className={container}>

@@ -1,5 +1,5 @@
 import React from "react"
-import style from "@/styles/base/input.module.scss"
+import style from "~/styles/base/input.module.scss"
 
 interface Error {
   name: string
@@ -11,7 +11,7 @@ interface Props {
   value: string
   type: string
   name: string
-  errors: Error[]
+  errors?: Error[]
   onChange: (object) => any
 }
 
@@ -24,8 +24,10 @@ const Input: React.FC<Props> = ({
   errors,
 }) => {
   const filterErrorMessage = () => {
-    const found = errors.find(({ name: fieldName }) => fieldName === name)
-    if (found) return found.message
+    if (errors) {
+      const found = errors.find(({ name: fieldName }) => fieldName === name)
+      if (found) return found.message
+    }
   }
   return (
     <div className={style.field}>

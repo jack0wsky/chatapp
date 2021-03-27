@@ -1,0 +1,13 @@
+.container {
+  display: grid;
+  grid-template-areas: "header header header" "side-menu chat chat";
+  grid-template-rows: 80px calc(100vh - 80px);
+  grid-template-columns: 5vw 95vw;
+  background-color: var(--background);
+  height: 100%;
+  width: 80%;
+}
+
+.containerToggle {
+  grid-template-columns: 20vw 80vw;
+}

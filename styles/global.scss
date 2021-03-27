@@ -8,7 +8,7 @@
 
 :root {
   --background: #353535;
-  --lightBg: #4e4e4e;
+  --lightBg: #1f1f1f;
   --text: #f1f1f1;
   --cta: #003EB1;
   --warning: #E73D23;
@@ -24,4 +24,9 @@ button {
   &:focus {
     outline: none;
   }
+}
+
+a {
+  text-decoration: none;
+  color: var(--white);
 }

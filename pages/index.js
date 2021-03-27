@@ -1,5 +1,5 @@
 import Head from "next/head"
-import Hello from "@/components/Hello"
+import Login from "~/components/Login"
 
 const Home = () => {
   return (
@@ -7,7 +7,7 @@ const Home = () => {
       <Head>
         <title>Chat app</title>
       </Head>
-      <Hello />
+      <Login />
     </div>
   )
 }

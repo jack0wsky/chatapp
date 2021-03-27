@@ -1,0 +1,28 @@
+.container {
+  background-color: var(--lightBg);
+  align-items: center;
+  display: flex;
+  font-size: 1.2em;
+  height: 70px;
+  padding: 15px 20px;
+  position: relative;
+  width: 100%;
+
+  &:hover {
+    background-color: rgba(59, 59, 59, 0.91);
+  }
+}
+
+.isActive {
+  &:before {
+    background-color: #0ab534;
+    display: block;
+    content: "";
+    height: 100%;
+    left: 0;
+    position: absolute;
+    top: 0;
+    width: 3px;
+    z-index: 2;
+  }
+}

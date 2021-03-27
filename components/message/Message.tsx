@@ -1,5 +1,5 @@
 import { useEffect } from "react"
-import styles from "@/styles/message.module.scss"
+import styles from "~/styles/message.module.scss"
 
 interface iProps {
   isCurrentUser: boolean
@@ -13,8 +13,11 @@ const Message = ({ message, user, isCurrentUser, uploadTime }: iProps) => {
   const getTime = () => {
     const uploaded = new Date(uploadTime).getMinutes()
     const now = new Date().getMinutes()
-    if (now - uploaded === 0) return "now"
-    return `${now - uploaded}m`
+    if (now - uploaded === 0) {
+      return "now"
+    } else {
+      return `${now - uploaded}m`
+    }
   }
 
   useEffect(() => {

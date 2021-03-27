@@ -1,8 +1,8 @@
 import styled from "styled-components"
 import { motion } from "framer-motion"
-import Input from "@/components/input/input"
+import Input from "~/components/input/input"
 import React, { useState } from "react"
-import styles from "@/styles/createRoom.module.scss"
+import styles from "~/styles/createRoom.module.scss"
 
 type Props = {
   toggleModal: boolean

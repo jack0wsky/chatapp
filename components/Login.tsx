@@ -1,22 +1,30 @@
-import { useState, useContext, useEffect } from "react"
+import React from "react"
+import { useState, useContext } from "react"
 import { useRouter } from "next/router"
-import Input from "@/components/input/input"
-import Context from "@/context/context"
+import Link from "next/link"
+import Input from "~/components/input/input"
+import Context from "~/context/context"
 import firebase from "firebase/app"
 import "firebase/auth"
-import Firebase from "@/constants/firebase"
-import style from "@/styles/hello.module.scss"
-import { validateLogin } from "@/services/loginValidation"
-import { FormFields } from "@/utils/formFields"
-import { credentials } from "@grpc/grpc-js"
+import Firebase from "~/constants/firebase"
+import style from "~/styles/hello.module.scss"
+import { validateLogin } from "~/services/loginValidation"
+import { FormFields } from "~/utils/formFields"
 
-const formStates = Object.freeze({
-  default: "Login",
-  sending: "Logging in...",
-  success: "Succes!",
-})
+enum formStates {
+  default = "Login",
+  sending = "Logging in...",
+  success = "Succes!",
+}
 
-const Hello = () => {
+type EventTarget = {
+  target: {
+    name: string
+    value: string
+  }
+}
+
+const Login: React.FC = () => {
   const [email, setEmail] = useState("")
   const [password, setPassword] = useState("")
   const [username, setUsername] = useState("")
@@ -30,7 +38,7 @@ const Hello = () => {
 
   const router = useRouter()
 
-  const handleInput = (e: any): any => {
+  const handleInput = (e: EventTarget): Record<string, unknown> => {
     const { name, value } = e.target
 
     switch (name) {
@@ -63,20 +71,13 @@ const Hello = () => {
     setSubmitButton(formStates.sending)
     Firebase.auth()
       .signInWithEmailAndPassword(email, password)
-      .then(() => {
+      .then(res => {
+        console.log(res)
+        const { setUser }: any = ctx
+        setUser(Firebase.auth().currentUser.displayName)
         setLogged(true)
         setSubmitButton(formStates.success)
-        const user = Firebase.auth().currentUser
-        user
-          .updateProfile({
-            displayName: username,
-          })
-          .then(async () => {
-            const { setUser }: unknown = ctx
-            setUser(user)
-            router.push("/dashboard")
-          })
-          .catch(err => console.log(err))
+        router.push("/chat/general")
       })
       .catch(err => {
         setSubmitButton(formStates.default)
@@ -86,7 +87,7 @@ const Hello = () => {
 
   const handleLogin = async (e: any) => {
     e.preventDefault()
-    const errors = validateLogin({ email, username, password })
+    const errors = validateLogin({ email, password })
     setFieldErrors(errors)
     if (errors.length === 0) await loginWithPersistence()
   }
@@ -122,10 +123,13 @@ const Hello = () => {
         <button className={style.submit} type="submit" onClick={handleLogin}>
           {submitButton}
         </button>
+        <p>
+          Don't have account? <Link href="/register">Create one</Link>
+        </p>
         <p className={style.error}>{loginError}</p>
       </form>
     </section>
   )
 }
 
-export default Hello
+export default Login
