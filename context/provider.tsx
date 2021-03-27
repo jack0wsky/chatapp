@@ -1,5 +1,5 @@
 import { Component } from "react"
-import UserContext from "~/context/context.ts"
+import UserContext from "~/context/context"
 
 interface Room {
   name: string

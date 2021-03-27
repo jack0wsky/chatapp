@@ -9,7 +9,7 @@ import SideMenu from "~/components/sideMenu/sideMenu"
 import styles from "~/styles/chat.module.scss"
 import { db } from "~/constants/firebase"
 
-const RoomTemplate: React.FC = () => {
+const RoomTemplate = () => {
   const socket = io("http://localhost:3001")
   const router = useRouter()
   const [welcome, setWelcome] = useState("")
