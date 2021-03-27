@@ -3,56 +3,94 @@ import { io } from "socket.io-client"
 import { useRouter } from "next/router"
 import Context from "~/context/context"
 import ChatLayout from "~/layouts/chatLayout"
-import Message from "~/components/message/Message"
 import ChatHeader from "~/components/chatHeader/chatHeader"
+import Chat from "~/components/chat/chat"
 import SideMenu from "~/components/sideMenu/sideMenu"
-import styles from "~/styles/chat.module.scss"
-import { db } from "~/constants/firebase"
 
-const RoomTemplate = () => {
+const RoomTemplate: React.FC = () => {
   const socket = io("http://localhost:3001")
   const router = useRouter()
-  const [welcome, setWelcome] = useState("")
   const [message, setMessage] = useState("")
   const [type, setType] = useState({ isTyping: false, user: "" })
   const [messages, setMessages] = useState([])
-  const [adminMessage, setAdminMessage] = useState("")
+  const [channels, setChannels] = useState([])
   const [toggleSideMenu, setSideMenu] = useState(false)
+  const [user, setUser] = useState("")
   const ctx = useContext(Context)
 
-  useEffect(() => {
-    if (!ctx.user) {
-      router.push("/")
-    } else {
-      socket.emit("join", {
-        name: ctx.user.displayName,
-        slug: router.query.slug,
-      })
-      socket.on("helloMessage", ({ text }) => setWelcome(text))
-      socket.on("globalMessage", ({ text }) => setAdminMessage(text))
+  const sortAlphabetically = arr => {
+    return arr.sort((a, b) => {
+      if (a.name > b.name) return 1
+      if (a.name < b.name) return -1
+      return 0
+    })
+  }
+
+  const getChannels = (db, user) => {
+    try {
       db.collection("channels")
+        .where("members", "array-contains", user.displayName)
         .get()
         .then(querySnapshot => {
-          querySnapshot.forEach(doc => console.log(doc.data().name))
+          const tempArr = []
+          querySnapshot.forEach(doc => {
+            tempArr.push(doc.data())
+          })
+          setChannels(sortAlphabetically(tempArr))
         })
+    } catch (e) {
+      console.log(e)
     }
-  }, [ctx.user])
+  }
+
+  useEffect(() => {
+    socket.emit("join", {
+      name: user,
+      slug: router.query.slug,
+    })
+    socket.on("globalMessage", msg => {
+      console.log(msg)
+    })
+    const { firebase } = ctx
+    if (firebase) {
+      firebase.auth().onAuthStateChanged(user => {
+        if (user) {
+          setUser(user.displayName)
+          const db = firebase.firestore()
+          socket.emit("join", {
+            name: user.displayName,
+            slug: router.query.slug,
+          })
+          db.collection("messages")
+            .get()
+            .then(querySnapshot =>
+              querySnapshot.forEach(doc => console.log(doc.data()))
+            )
+          getChannels(db, user)
+        } else {
+          router.push("/")
+        }
+      })
+    }
+  }, [])
 
   useEffect(() => {
     socket.on("message", msg => {
+      console.log("fire")
       setMessages(prevState => [...prevState, msg])
     })
     socket.on("isTyping", ({ name }) => {
       setType({ isTyping: true, user: name })
     })
-  })
+  }, [message])
 
   const sendMessage = e => {
-    setType({ isTyping: false, user: "" })
     e.preventDefault()
+    setType({ isTyping: false, user: "" })
+
     const timestamp = new Date()
     socket.emit("sendMessage", {
-      name: ctx.user.displayName,
+      name: user,
       room: router.query.slug,
       message,
       timestamp,
@@ -62,7 +100,7 @@ const RoomTemplate = () => {
 
   const onType = e => {
     socket.emit("typing", {
-      name: ctx.user.displayName,
+      name: user,
       room: router.query.slug,
     })
     if (e.target.value.length === 0 || e.target.value === "") {
@@ -71,50 +109,26 @@ const RoomTemplate = () => {
     setMessage(e.target.value)
   }
 
-  const onEnter = e => {
-    if (e.key === "Enter") sendMessage(e)
-  }
+  const onEnter = e => e.key === "Enter" && sendMessage(e)
 
   const handleSideMenu = () => setSideMenu(!toggleSideMenu)
 
   return (
     <ChatLayout>
-      <ChatHeader welcome={welcome} chatStatus={adminMessage} />
+      <ChatHeader user={user} />
       <SideMenu
         handleSideMenu={handleSideMenu}
         toggleSideMenu={toggleSideMenu}
+        channels={channels}
       />
-      <section className={styles.chatWrapper}>
-        <div className={styles.messages}>
-          {messages.map(({ message, name, timestamp }) => {
-            return (
-              <Message
-                key={timestamp}
-                message={message}
-                user={name}
-                isCurrentUser={name === ctx.user.displayName}
-                uploadTime={timestamp}
-              />
-            )
-          })}
-        </div>
-        {type.isTyping && (
-          <p className={styles.isTyping}>{type.user} is typing</p>
-        )}
-        <div className={styles.writeBox}>
-          <input
-            className={styles.input}
-            value={message}
-            onChange={onType}
-            placeholder="Write..."
-            type="text"
-            onKeyPress={onEnter}
-          />
-          <button className={styles.sendButton} onClick={sendMessage}>
-            Send
-          </button>
-        </div>
-      </section>
+      <Chat
+        messages={messages}
+        onEnter={onEnter}
+        type={type}
+        onType={onType}
+        message={message}
+        user={user}
+      />
     </ChatLayout>
   )
 }

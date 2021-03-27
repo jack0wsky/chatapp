@@ -1,30 +1,43 @@
+import React, { Component } from "react"
 import styles from "~/styles/sideMenu.module.scss"
 import Channel from "~/components/channel/channel"
-import { useRouter } from "next/router"
+import { withRouter } from "next/router"
+import { io } from "socket.io-client"
 
-type Props = {
-  handleSideMenu: () => any
-  toggleSideMenu: boolean
+type Channel = {
+  name: string
+  member: string
 }
 
-const channels = ["general", "developers"]
+interface Props {
+  channels: Channel[]
+  router: object
+}
+interface IState {
+  currentChat: string
+}
 
-const SideMenu = ({ handleSideMenu, toggleSideMenu }: Props) => {
-  const {
-    container,
-    toggleButton,
-    channelsSection,
-    channelsGrid,
-    sectionHeader,
-    sectionTitle,
-    createChannel,
-  } = styles
+class SideMenu extends Component<IState, Props> {
+  constructor(props) {
+    super(props)
+    this.state = {
+      currentChat: props.channels[0].name,
+    }
+    this.socket = io("http://localhost:3001")
+  }
 
-  const router = useRouter()
+  componentDidUpdate(prevProps, prevState: IState) {
+    if (prevState.currentChat !== this.state.currentChat) {
+    }
+  }
 
-  const matchCurrentChannel = (e, className, defaultClass) => {
-    const { slug } = router.query
-    const match = channels.find(channel => channel === slug)
+  switchChannels = (name: string) => {
+    this.setState({ currentChannel: name })
+  }
+
+  matchCurrentChannel = (e, className, defaultClass) => {
+    const { slug } = this.props.router.query
+    const match = this.props.channels.find(channel => channel.name === slug)
     if (match) {
       const links = []
       const allLinks = defaultClass.current.parentNode.children
@@ -33,25 +46,43 @@ const SideMenu = ({ handleSideMenu, toggleSideMenu }: Props) => {
       e.currentTarget.classList.add(className)
     }
   }
-  return (
-    <div className={container}>
-      <button className={toggleButton} onClick={handleSideMenu} />
-      <div className={channelsSection}>
-        <div className={sectionHeader}>
-          <h3 className={sectionTitle}>Channels</h3>
-          <button className={createChannel}>+</button>
-        </div>
-        <div className={channelsGrid}>
-          {channels.map(channel => (
-            <Channel
-              matchCurrentChannel={matchCurrentChannel}
-              channelName={channel}
-            />
-          ))}
+  render() {
+    const {
+      container,
+      channelsSection,
+      channelsGrid,
+      sectionHeader,
+      sectionTitle,
+      createChannel,
+    } = styles
+
+    const { channels } = this.props
+
+    return (
+      <div className={container}>
+        <div className={channelsSection}>
+          <div className={sectionHeader}>
+            <h3 className={sectionTitle}>Channels</h3>
+            <button className={createChannel}>+</button>
+          </div>
+          <div className={channelsGrid}>
+            {channels.length > 0 ? (
+              channels.map(channel => (
+                <Channel
+                  key={channel.name}
+                  matchCurrentChannel={this.matchCurrentChannel}
+                  channelName={channel.name}
+                  switchChannels={this.switchChannels}
+                />
+              ))
+            ) : (
+              <p>Loading channels...</p>
+            )}
+          </div>
         </div>
       </div>
-    </div>
-  )
+    )
+  }
 }
 
-export default SideMenu
+export default withRouter(SideMenu)

@@ -13,18 +13,7 @@ const Message = ({ message, user, isCurrentUser, uploadTime }: iProps) => {
   const getTime = () => {
     const uploaded = new Date(uploadTime).getMinutes()
     const now = new Date().getMinutes()
-    if (now - uploaded === 0) {
-      return "now"
-    } else {
-      return `${now - uploaded}m`
-    }
   }
-
-  useEffect(() => {
-    setInterval(() => {
-      getTime()
-    }, 60000)
-  }, [])
 
   const {
     container,
@@ -41,7 +30,7 @@ const Message = ({ message, user, isCurrentUser, uploadTime }: iProps) => {
 
   return (
     <div className={conditionalClass(container, isMyMessage)}>
-      <p className={styles.time}>{getTime()}</p>
+      <p className={styles.time}></p>
       <div
         className={conditionalClass(messageContainer, strangerMessageContainer)}
       >

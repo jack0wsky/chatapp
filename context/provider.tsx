@@ -1,5 +1,8 @@
 import { Component } from "react"
 import UserContext from "~/context/context"
+import firebase from "~/constants/firebase"
+import "firebase/auth"
+import "firebase/firestore"
 
 interface Room {
   name: string
@@ -38,6 +41,7 @@ class Provider extends Component<IState> {
           setUser: this.setUser,
           theme: this.state.theme,
           toggleTheme: this.toggleTheme,
+          firebase,
         }}
       >
         {children}

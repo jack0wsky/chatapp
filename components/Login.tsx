@@ -6,7 +6,6 @@ import Input from "~/components/input/input"
 import Context from "~/context/context"
 import firebase from "firebase/app"
 import "firebase/auth"
-import Firebase from "~/constants/firebase"
 import style from "~/styles/hello.module.scss"
 import { validateLogin } from "~/services/loginValidation"
 import { FormFields } from "~/utils/formFields"
@@ -57,7 +56,8 @@ const Login: React.FC = () => {
   }
 
   const loginWithPersistence = async () => {
-    await Firebase.auth()
+    await ctx.firebase
+      .auth()
       .setPersistence(firebase.auth.Auth.Persistence.SESSION)
       .then(() => {
         return firebaseInit()
@@ -69,12 +69,14 @@ const Login: React.FC = () => {
 
   const firebaseInit = () => {
     setSubmitButton(formStates.sending)
-    Firebase.auth()
+    const { firebase } = ctx
+    firebase
+      .auth()
       .signInWithEmailAndPassword(email, password)
       .then(res => {
         console.log(res)
         const { setUser }: any = ctx
-        setUser(Firebase.auth().currentUser.displayName)
+        setUser(firebase.auth().currentUser.displayName)
         setLogged(true)
         setSubmitButton(formStates.success)
         router.push("/chat/general")

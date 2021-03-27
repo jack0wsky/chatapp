@@ -36,18 +36,20 @@
   display: flex;
   height: 5vh;
   min-height: 60px;
+  padding: 0 50px 0 0;
   width: 100%;
 }
 
 .input {
   background-color: var(--lightBg);
   border: var(--lightBg);
+  color: var(--white);
   border-radius: 50px;
   font-size: 1em;
   height: 44px;
   margin: 0 20px;
   padding: 20px;
-  width: 60%;
+  width: 100%;
 
   &:focus {
     outline: none;

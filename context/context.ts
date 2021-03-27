@@ -1,4 +1,5 @@
 import { createContext } from "react"
+import firebase from "~/constants/firebase"
 
 export default createContext({
   rooms: [],
@@ -6,4 +7,5 @@ export default createContext({
   setUser: (user: unknown) => {},
   theme: false,
   toggleTheme: () => {},
+  firebase: {},
 })

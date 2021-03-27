@@ -12,11 +12,17 @@ type Props = {
     className: string,
     defaultClass: string | object
   ) => void
+  switchChannels: () => void
 }
 
-const Channel: ({ channelName, matchCurrentChannel }: Props) => JSX.Element = ({
+const Channel: ({
   channelName,
   matchCurrentChannel,
+  switchChannels,
+}: Props) => JSX.Element = ({
+  channelName,
+  matchCurrentChannel,
+  switchChannels,
 }: Props) => {
   const { container, isActive } = styles
   const channel = useRef(null)
@@ -32,11 +38,8 @@ const Channel: ({ channelName, matchCurrentChannel }: Props) => JSX.Element = ({
   }, [])
 
   const joinChannel = e => {
+    switchChannels(channelName)
     matchCurrentChannel(e, isActive, channel)
-    socket.emit("join", {
-      name: ctx.user.displayName,
-      slug: query.slug,
-    })
   }
 
   return (
