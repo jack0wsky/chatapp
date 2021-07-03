@@ -23,15 +23,19 @@ class Provider extends Component<IState> {
     ],
     theme: false,
   }
-  setUser = user => this.setState({ user })
+  setUser = (user: string): React.ComponentState => this.setState({ user })
 
-  toggleTheme = () => {
+  toggleTheme = (): React.ComponentState => {
     this.setState((prevState: Record<string, unknown>) => ({
       theme: !prevState.theme,
     }))
   }
 
-  render() {
+  cacheMessages = (key: string, value: any) => {
+    localStorage.setItem(key, JSON.stringify(value))
+  }
+
+  render(): JSX.Element {
     const { children } = this.props
     return (
       <UserContext.Provider
@@ -41,6 +45,7 @@ class Provider extends Component<IState> {
           setUser: this.setUser,
           theme: this.state.theme,
           toggleTheme: this.toggleTheme,
+          cacheMessages: this.cacheMessages,
           firebase,
         }}
       >

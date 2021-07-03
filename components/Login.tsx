@@ -26,7 +26,6 @@ type EventTarget = {
 const Login: React.FC = () => {
   const [email, setEmail] = useState("")
   const [password, setPassword] = useState("")
-  const [username, setUsername] = useState("")
 
   const [fieldErrors, setFieldErrors] = useState([])
   const [submitButton, setSubmitButton] = useState(formStates.default)
@@ -49,22 +48,23 @@ const Login: React.FC = () => {
         setPassword(value)
         return
       }
-      case FormFields.username: {
-        setUsername(value)
-      }
     }
   }
 
   const loginWithPersistence = async () => {
-    await ctx.firebase
-      .auth()
-      .setPersistence(firebase.auth.Auth.Persistence.SESSION)
-      .then(() => {
-        return firebaseInit()
-      })
-      .catch(err => {
-        console.log(err)
-      })
+    try {
+      await ctx.firebase
+        .auth()
+        .setPersistence(firebase.auth.Auth.Persistence.SESSION)
+        .then(() => {
+          return firebaseInit()
+        })
+        .catch(() => {
+          console.log("error")
+        })
+    } catch (e) {
+      setLoginError(e.message)
+    }
   }
 
   const firebaseInit = () => {
@@ -73,12 +73,12 @@ const Login: React.FC = () => {
     firebase
       .auth()
       .signInWithEmailAndPassword(email, password)
-      .then(res => {
-        console.log(res)
+      .then(() => {
         const { setUser }: any = ctx
         setUser(firebase.auth().currentUser.displayName)
         setLogged(true)
         setSubmitButton(formStates.success)
+        setLoginError("")
         router.push("/chat/general")
       })
       .catch(err => {
@@ -97,6 +97,9 @@ const Login: React.FC = () => {
   return (
     <section className={style.container}>
       {isLogged && <div className={style.success}>Logged successfully</div>}
+      {loginError !== "" ? (
+        <div className={style.error}>{loginError}</div>
+      ) : null}
       <form className={style.form}>
         <Input
           onChange={handleInput}
@@ -104,14 +107,6 @@ const Login: React.FC = () => {
           value={email}
           type="text"
           name={FormFields.email}
-          errors={fieldErrors}
-        />
-        <Input
-          onChange={handleInput}
-          label="Username"
-          value={username}
-          type="text"
-          name={FormFields.username}
           errors={fieldErrors}
         />
         <Input
@@ -128,7 +123,6 @@ const Login: React.FC = () => {
         <p>
           Don't have account? <Link href="/register">Create one</Link>
         </p>
-        <p className={style.error}>{loginError}</p>
       </form>
     </section>
   )

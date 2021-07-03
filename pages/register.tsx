@@ -3,6 +3,8 @@ import "firebase/auth"
 import firebase from "~/constants/firebase"
 import styles from "~/styles/hello.module.scss"
 import Input from "~/components/input/input"
+import Link from "next/link"
+import { router } from "next/client"
 
 const Register: React.FC = () => {
   const handleRegister = async e => {
@@ -11,6 +13,7 @@ const Register: React.FC = () => {
       .auth()
       .createUserWithEmailAndPassword(formFields.email, formFields.password)
       .then(() => setUsername())
+      .then(() => router.push("/"))
       .catch(err => console.log(err))
   }
 
@@ -60,6 +63,9 @@ const Register: React.FC = () => {
         <button onClick={e => handleRegister(e)} className={styles.submit}>
           Register
         </button>
+        <p>
+          Already member? <Link href="/">Login</Link>
+        </p>
       </form>
     </div>
   )

@@ -35,6 +35,9 @@
   &:focus {
     outline: none;
   }
+  &:hover {
+    background-color: #013385;
+  }
 }
 
 .success {
@@ -50,6 +53,14 @@
 }
 
 .error {
+  align-items: center;
+  background-color: var(--warning);
+  color: var(--white);
+  display: flex;
+  height: 40px;
+  left: 0;
+  justify-content: center;
+  position: absolute;
+  top: 0;
   width: 100%;
-  max-width: 200px;
 }

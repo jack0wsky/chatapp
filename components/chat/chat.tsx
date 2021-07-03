@@ -2,10 +2,13 @@ import React, { Component } from "react"
 import styles from "~/styles/chat.module.scss"
 import Message from "~/components/message/Message"
 
-interface Message {
+export interface Message {
   user: string
+  name: string
   message: string
-  timestamp: number | string
+  timestamp: string
+  text?: string
+  key: number
 }
 
 interface Type {
@@ -14,14 +17,17 @@ interface Type {
 }
 
 interface IProps {
+  globalMessage: string
   messages: Message[]
   type: Type
   message: string
-  onType: () => void
-  onEnter: () => void
+  user: string
+  onType: (e: React.ChangeEvent<HTMLInputElement>) => void
+  onEnter: (e: React.KeyboardEvent<HTMLInputElement>) => void
+  loggedUser: string
 }
 
-class Chat extends Component<any, IProps> {
+class Chat extends Component<IProps, never> {
   render() {
     const {
       chatWrapper,
@@ -30,17 +36,29 @@ class Chat extends Component<any, IProps> {
       writeBox,
       input,
     } = styles
-    const { messages, user, type, message, onType, onEnter } = this.props
+
+    const {
+      messages,
+      type,
+      message,
+      onType,
+      onEnter,
+      globalMessage,
+      loggedUser,
+    } = this.props
+
     return (
       <section className={chatWrapper}>
+        <p>{globalMessage}</p>
         <div className={messagesStyle}>
-          {messages.map(({ message, name, timestamp }) => {
+          {messages.map(({ message, name, timestamp, text, key }) => {
             return (
               <Message
-                key={timestamp}
+                key={key}
                 message={message}
+                text={text}
                 user={name}
-                isCurrentUser={name === user}
+                isCurrentUser={name === loggedUser}
                 uploadTime={timestamp}
               />
             )
@@ -51,10 +69,10 @@ class Chat extends Component<any, IProps> {
           <input
             className={input}
             value={message}
-            onChange={onType}
+            onChange={e => onType(e)}
             placeholder="Write..."
             type="text"
-            onKeyPress={onEnter}
+            onKeyPress={e => onEnter(e)}
           />
         </div>
       </section>

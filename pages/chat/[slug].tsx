@@ -6,11 +6,13 @@ import ChatLayout from "~/layouts/chatLayout"
 import ChatHeader from "~/components/chatHeader/chatHeader"
 import Chat from "~/components/chat/chat"
 import SideMenu from "~/components/sideMenu/sideMenu"
+import { useLocalStorage } from "~/utils/useLocalStorage"
 
 const RoomTemplate: React.FC = () => {
   const socket = io("http://localhost:3001")
   const router = useRouter()
   const [message, setMessage] = useState("")
+  const [globalMessage, setGlobalMessage] = useState<React.ComponentState>("")
   const [type, setType] = useState({ isTyping: false, user: "" })
   const [messages, setMessages] = useState([])
   const [channels, setChannels] = useState([])
@@ -24,6 +26,14 @@ const RoomTemplate: React.FC = () => {
       if (a.name < b.name) return -1
       return 0
     })
+  }
+
+  const initSocket = () => {
+    try {
+      return io("http://localhost:3001")
+    } catch (e) {
+      console.log(e)
+    }
   }
 
   const getChannels = (db, user) => {
@@ -43,14 +53,7 @@ const RoomTemplate: React.FC = () => {
     }
   }
 
-  useEffect(() => {
-    socket.emit("join", {
-      name: user,
-      slug: router.query.slug,
-    })
-    socket.on("globalMessage", msg => {
-      console.log(msg)
-    })
+  const fetchChannels = () => {
     const { firebase } = ctx
     if (firebase) {
       firebase.auth().onAuthStateChanged(user => {
@@ -61,28 +64,48 @@ const RoomTemplate: React.FC = () => {
             name: user.displayName,
             slug: router.query.slug,
           })
-          db.collection("messages")
-            .get()
-            .then(querySnapshot =>
-              querySnapshot.forEach(doc => console.log(doc.data()))
-            )
-          getChannels(db, user)
+          try {
+            db.collection("messages")
+              .get()
+              .then(querySnapshot =>
+                querySnapshot.forEach(doc => console.log(doc.data()))
+              )
+            getChannels(db, user)
+          } catch (e) {
+            console.log(e)
+          }
         } else {
           router.push("/")
         }
       })
     }
+  }
+
+  useEffect(() => {
+    const { setUser, firebase } = ctx
+    console.log(firebase.auth().currentUser)
+    if (firebase.auth().currentUser) {
+      setUser(firebase.auth().currentUser.displayName)
+    }
+    initSocket()
+    socket.emit("join", {
+      name: user || "Stranger",
+      slug: router.query.slug || "general",
+    })
+    socket.on("globalMessage", ({ text }) => {
+      console.log(text)
+      setGlobalMessage(text)
+    })
+    socket.on("members", members => console.log("members", members))
+    fetchChannels()
   }, [])
 
   useEffect(() => {
     socket.on("message", msg => {
-      console.log("fire")
       setMessages(prevState => [...prevState, msg])
     })
-    socket.on("isTyping", ({ name }) => {
-      setType({ isTyping: true, user: name })
-    })
-  }, [message])
+    ctx.cacheMessages("messages", messages)
+  }, [messages, message])
 
   const sendMessage = e => {
     e.preventDefault()
@@ -94,6 +117,7 @@ const RoomTemplate: React.FC = () => {
       room: router.query.slug,
       message,
       timestamp,
+      key: messages.length + 1,
     })
     setMessage("")
   }
@@ -112,7 +136,6 @@ const RoomTemplate: React.FC = () => {
   const onEnter = e => e.key === "Enter" && sendMessage(e)
 
   const handleSideMenu = () => setSideMenu(!toggleSideMenu)
-
   return (
     <ChatLayout>
       <ChatHeader user={user} />
@@ -121,14 +144,18 @@ const RoomTemplate: React.FC = () => {
         toggleSideMenu={toggleSideMenu}
         channels={channels}
       />
-      <Chat
-        messages={messages}
-        onEnter={onEnter}
-        type={type}
-        onType={onType}
-        message={message}
-        user={user}
-      />
+      {ctx.firebase && (
+        <Chat
+          globalMessage={globalMessage}
+          messages={messages}
+          onEnter={onEnter}
+          type={type}
+          onType={onType}
+          message={message}
+          user={user}
+          loggedUser={"stranger"}
+        />
+      )}
     </ChatLayout>
   )
 }
