@@ -2,26 +2,35 @@ import React, { Component } from "react"
 import styles from "~/styles/sideMenu.module.scss"
 import Channel from "~/components/channel/channel"
 import { withRouter } from "next/router"
-import { io } from "socket.io-client"
+import { io, Socket } from "socket.io-client"
+import { RouteComponentProps } from "react-router"
 
 type Channel = {
   name: string
   member: string
 }
 
+interface RouterProps extends RouteComponentProps {
+  query?: {
+    slug: string
+  }
+}
+
 interface Props {
   channels: Channel[]
-  router: object
+  router: RouterProps
 }
 interface IState {
   currentChat: string
 }
 
-class SideMenu extends Component<IState, Props> {
+class SideMenu extends Component<Props, IState> {
+  private socket: Socket
+
   constructor(props) {
     super(props)
     this.state = {
-      currentChat: props.channels[0].name,
+      currentChat: "test name",
     }
     this.socket = io("http://localhost:3001")
   }
@@ -32,7 +41,7 @@ class SideMenu extends Component<IState, Props> {
   }
 
   switchChannels = (name: string) => {
-    this.setState({ currentChannel: name })
+    this.setState({ currentChat: name })
   }
 
   matchCurrentChannel = (e, className, defaultClass) => {

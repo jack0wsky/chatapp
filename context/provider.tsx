@@ -1,4 +1,4 @@
-import { Component } from "react"
+import React, { Component } from "react"
 import UserContext from "~/context/context"
 import firebase from "~/constants/firebase"
 import "firebase/auth"

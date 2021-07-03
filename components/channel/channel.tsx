@@ -12,7 +12,7 @@ type Props = {
     className: string,
     defaultClass: string | object
   ) => void
-  switchChannels: () => void
+  switchChannels: (name: string) => void
 }
 
 const Channel: ({

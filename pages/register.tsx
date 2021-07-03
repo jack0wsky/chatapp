@@ -1,10 +1,10 @@
-import { useState } from "react"
+import React, { useState } from "react"
 import "firebase/auth"
 import firebase from "~/constants/firebase"
 import styles from "~/styles/hello.module.scss"
 import Input from "~/components/input/input"
 
-const Register = () => {
+const Register: React.FC = () => {
   const handleRegister = async e => {
     e.preventDefault()
     await firebase

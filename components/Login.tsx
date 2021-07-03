@@ -13,7 +13,7 @@ import { FormFields } from "~/utils/formFields"
 enum formStates {
   default = "Login",
   sending = "Logging in...",
-  success = "Succes!",
+  success = "Success!",
 }
 
 type EventTarget = {
