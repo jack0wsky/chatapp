@@ -6,10 +6,9 @@ import ChatLayout from "~/layouts/chatLayout"
 import ChatHeader from "~/components/chatHeader/chatHeader"
 import Chat from "~/components/chat/chat"
 import SideMenu from "~/components/sideMenu/sideMenu"
-import { useLocalStorage } from "~/utils/useLocalStorage"
 
 const RoomTemplate: React.FC = () => {
-  const socket = io("http://localhost:3001")
+  //const socket = io("http://localhost:3001")
   const router = useRouter()
   const [message, setMessage] = useState("")
   const [globalMessage, setGlobalMessage] = useState<React.ComponentState>("")
@@ -32,13 +31,13 @@ const RoomTemplate: React.FC = () => {
     try {
       return io("http://localhost:3001")
     } catch (e) {
-      console.log(e)
+      console.log(e, "some error")
     }
   }
 
-  const getChannels = (db, user) => {
-    try {
-      db.collection("channels")
+  const getChannels = async (db, user) => {
+    const items = db.collection("channels")
+    /* items
         .where("members", "array-contains", user.displayName)
         .get()
         .then(querySnapshot => {
@@ -47,10 +46,7 @@ const RoomTemplate: React.FC = () => {
             tempArr.push(doc.data())
           })
           setChannels(sortAlphabetically(tempArr))
-        })
-    } catch (e) {
-      console.log(e)
-    }
+        }), */
   }
 
   const fetchChannels = () => {
@@ -60,7 +56,7 @@ const RoomTemplate: React.FC = () => {
         if (user) {
           setUser(user.displayName)
           const db = firebase.firestore()
-          socket.emit("join", {
+          initSocket().emit("join", {
             name: user.displayName,
             slug: router.query.slug,
           })
@@ -81,27 +77,28 @@ const RoomTemplate: React.FC = () => {
     }
   }
 
+  const handleJoinRoom = () => {
+    initSocket().emit("join", {
+      name: user || "Stranger",
+      slug: router.query.slug || "general",
+    })
+    initSocket().on("globalMessage", ({ text }) => setGlobalMessage(text))
+  }
+
   useEffect(() => {
     const { setUser, firebase } = ctx
-    console.log(firebase.auth().currentUser)
     if (firebase.auth().currentUser) {
       setUser(firebase.auth().currentUser.displayName)
     }
     initSocket()
-    socket.emit("join", {
-      name: user || "Stranger",
-      slug: router.query.slug || "general",
-    })
-    socket.on("globalMessage", ({ text }) => {
-      console.log(text)
-      setGlobalMessage(text)
-    })
-    socket.on("members", members => console.log("members", members))
+    handleJoinRoom()
+    initSocket().on("members", members => console.log("members", members))
     fetchChannels()
-  }, [])
+    console.log(channels)
+  }, [channels])
 
   useEffect(() => {
-    socket.on("message", msg => {
+    initSocket().on("message", msg => {
       setMessages(prevState => [...prevState, msg])
     })
     ctx.cacheMessages("messages", messages)
@@ -112,7 +109,7 @@ const RoomTemplate: React.FC = () => {
     setType({ isTyping: false, user: "" })
 
     const timestamp = new Date()
-    socket.emit("sendMessage", {
+    initSocket().emit("sendMessage", {
       name: user,
       room: router.query.slug,
       message,
@@ -123,7 +120,7 @@ const RoomTemplate: React.FC = () => {
   }
 
   const onType = e => {
-    socket.emit("typing", {
+    initSocket().emit("typing", {
       name: user,
       room: router.query.slug,
     })
@@ -136,6 +133,7 @@ const RoomTemplate: React.FC = () => {
   const onEnter = e => e.key === "Enter" && sendMessage(e)
 
   const handleSideMenu = () => setSideMenu(!toggleSideMenu)
+
   return (
     <ChatLayout>
       <ChatHeader user={user} />

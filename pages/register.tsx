@@ -1,4 +1,4 @@
-import React, { useState } from "react"
+import React, { useState, FC } from "react"
 import "firebase/auth"
 import firebase from "~/constants/firebase"
 import styles from "~/styles/hello.module.scss"
@@ -6,7 +6,7 @@ import Input from "~/components/input/input"
 import Link from "next/link"
 import { router } from "next/client"
 
-const Register: React.FC = () => {
+const Register: FC = () => {
   const handleRegister = async e => {
     e.preventDefault()
     await firebase

@@ -4,19 +4,19 @@ import firebase from "~/constants/firebase"
 import "firebase/auth"
 import "firebase/firestore"
 
-interface Room {
+interface IRoom {
   name: string
   slug: string
 }
 
 interface IState {
   user: Record<string, string> | null
-  rooms: Room[]
+  rooms: IRoom[]
 }
 
 class Provider extends Component<IState> {
   state = {
-    user: null,
+    user: "",
     rooms: [
       { name: "Culture Talk", slug: "culture-talk" },
       { name: "Blinders", slug: "blinders" },

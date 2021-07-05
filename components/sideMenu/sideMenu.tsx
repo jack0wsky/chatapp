@@ -1,6 +1,7 @@
 import React, { Component } from "react"
 import styles from "~/styles/sideMenu.module.scss"
 import Channel from "~/components/channel/channel"
+import CreateChannel from "~/components/createChannel/createChannel"
 import { withRouter } from "next/router"
 import { io, Socket } from "socket.io-client"
 import { RouteComponentProps } from "react-router"
@@ -16,33 +17,34 @@ interface RouterProps extends RouteComponentProps {
   }
 }
 
-interface Props {
+interface IProps {
   channels: Channel[]
   router: RouterProps
 }
+
 interface IState {
   currentChat: string
+  isFormOpen: boolean
 }
 
-class SideMenu extends Component<Props, IState> {
+class SideMenu extends Component<IProps, IState> {
   private socket: Socket
 
   constructor(props) {
     super(props)
     this.state = {
       currentChat: "test name",
+      isFormOpen: false,
     }
     this.socket = io("http://localhost:3001")
-  }
-
-  componentDidUpdate(prevProps, prevState: IState) {
-    if (prevState.currentChat !== this.state.currentChat) {
-    }
   }
 
   switchChannels = (name: string) => {
     this.setState({ currentChat: name })
   }
+
+  handleForm = () =>
+    this.setState(({ isFormOpen }) => ({ isFormOpen: !isFormOpen }))
 
   matchCurrentChannel = (e, className, defaultClass) => {
     const { slug } = this.props.router.query
@@ -72,8 +74,13 @@ class SideMenu extends Component<Props, IState> {
         <div className={channelsSection}>
           <div className={sectionHeader}>
             <h3 className={sectionTitle}>Channels</h3>
-            <button className={createChannel}>+</button>
+            <button onClick={this.handleForm} className={createChannel}>
+              +
+            </button>
           </div>
+          {this.state.isFormOpen && (
+            <CreateChannel handleForm={this.handleForm} />
+          )}
           <div className={channelsGrid}>
             {channels.length > 0 ? (
               channels.map(channel => (

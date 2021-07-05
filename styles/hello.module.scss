@@ -13,7 +13,7 @@
   background-color: #ddd;
   display: grid;
   grid-row-gap: 20px;
-  grid-template-rows: repeat(3, 1fr);
+  grid-template-rows: 70px 70px 30px 60px;
   height: auto;
   min-height: 40px;
   padding: 50px;
@@ -63,4 +63,13 @@
   position: absolute;
   top: 0;
   width: 100%;
+}
+
+.rememberMe {
+  height: max-content;
+  width: 100%;
+}
+
+.rememberMeInput {
+  margin: 0 4px 0 0;
 }

@@ -1,4 +1,5 @@
 import React, { useContext } from "react"
+import Link from "next/link"
 import Context from "~/context/context"
 import style from "~/styles/chatHeader.module.scss"
 
@@ -12,6 +13,7 @@ const ChatHeader: ({ user }: Props) => JSX.Element = ({ user }: Props) => {
   return (
     <div className={style.wrapper}>
       <h2 className={style.name}>{user}</h2>
+      <Link href="/">Return</Link>
     </div>
   )
 }

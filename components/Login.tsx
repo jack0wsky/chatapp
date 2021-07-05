@@ -1,5 +1,5 @@
-import React from "react"
-import { useState, useContext } from "react"
+import React, { FC } from "react"
+import { useState, useContext, useEffect } from "react"
 import { useRouter } from "next/router"
 import Link from "next/link"
 import Input from "~/components/input/input"
@@ -23,18 +23,31 @@ type EventTarget = {
   }
 }
 
-const Login: React.FC = () => {
+const Login: FC = () => {
   const [email, setEmail] = useState("")
   const [password, setPassword] = useState("")
 
   const [fieldErrors, setFieldErrors] = useState([])
   const [submitButton, setSubmitButton] = useState(formStates.default)
   const [isLogged, setLogged] = useState(false)
+  const [rememberMe, setRememberMe] = useState(false)
 
   const ctx = useContext(Context)
   const [loginError, setLoginError] = useState("")
 
   const router = useRouter()
+
+  useEffect(() => {
+    if (ctx.user !== "") router.push("/chat/general")
+    if (email === "" && password === "") {
+      const cachedEmail = localStorage.getItem("e-mail")
+      const cachedPassword = localStorage.getItem("password")
+      const cachedConsent = localStorage.getItem("rememberMe")
+      if (cachedEmail) setEmail(cachedEmail)
+      if (cachedPassword) setPassword(cachedPassword)
+      if (cachedConsent) setRememberMe(JSON.parse(cachedConsent))
+    }
+  }, [])
 
   const handleInput = (e: EventTarget): Record<string, unknown> => {
     const { name, value } = e.target
@@ -67,6 +80,12 @@ const Login: React.FC = () => {
     }
   }
 
+  const cacheLoginData = () => {
+    localStorage.setItem("e-mail", email)
+    localStorage.setItem("password", password)
+    localStorage.setItem("rememberMe", JSON.stringify(rememberMe))
+  }
+
   const firebaseInit = () => {
     setSubmitButton(formStates.sending)
     const { firebase } = ctx
@@ -76,6 +95,13 @@ const Login: React.FC = () => {
       .then(() => {
         const { setUser }: any = ctx
         setUser(firebase.auth().currentUser.displayName)
+        if (rememberMe) {
+          cacheLoginData()
+        } else {
+          localStorage.removeItem("e-mail")
+          localStorage.removeItem("password")
+          localStorage.removeItem("rememberMe")
+        }
         setLogged(true)
         setSubmitButton(formStates.success)
         setLoginError("")
@@ -117,6 +143,15 @@ const Login: React.FC = () => {
           name={FormFields.password}
           errors={fieldErrors}
         />
+        <label className={style.rememberMe}>
+          <input
+            className={style.rememberMeInput}
+            type="checkbox"
+            checked={rememberMe}
+            onChange={() => setRememberMe(!rememberMe)}
+          />
+          Remember me
+        </label>
         <button className={style.submit} type="submit" onClick={handleLogin}>
           {submitButton}
         </button>

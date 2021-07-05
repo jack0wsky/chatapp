@@ -1,0 +1,21 @@
+.wrapper {
+  background-color: #ddd;
+  height: 200px;
+  padding: 15px;
+  width: 100%;
+}
+
+.inputWrapper {
+  display: flex;
+  flex-flow: column;
+}
+
+.input {
+  padding: 10px;
+}
+
+.button {
+  background-color: var(--cta);
+  color: var(--white);
+  padding: 10px 20px;
+}
